@@ -615,15 +615,51 @@ input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color:
       "&body=" + encodeURIComponent(details(v));
   }
   function plainText(v) {
+    var list = v.serie ? rest(v) : [v];
+    if (list.length > 1) {
+      return TITLE + " à " + hhmm(v.time) + " (" + everyLabel(v).toLowerCase() + ") : " +
+        list.map(function (x) { return fmtLong.format(fromIso(x.date)); }).join(", ") + ". " + PLACE;
+    }
     return TITLE + " : " + fmtLong.format(fromIso(v.date)) + " à " + hhmm(v.time) + (v.note ? " (" + v.note + ")" : "") + ". " + PLACE;
+  }
+
+  // Fichier .ics : contient toutes les visites d'un coup, lisible par Google Agenda, Apple Agenda, Outlook…
+  var ICS_ZONE = ["BEGIN:VTIMEZONE", "TZID:Europe/Paris",
+    "BEGIN:DAYLIGHT", "TZOFFSETFROM:+0100", "TZOFFSETTO:+0200", "TZNAME:CEST", "DTSTART:19700329T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU", "END:DAYLIGHT",
+    "BEGIN:STANDARD", "TZOFFSETFROM:+0200", "TZOFFSETTO:+0100", "TZNAME:CET", "DTSTART:19701025T030000", "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU", "END:STANDARD",
+    "END:VTIMEZONE"];
+  var icsText = function (t) { return String(t).replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;"); };
+  function icsFile(list) {
+    var stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+    var out = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Visite a Dedette//FR", "CALSCALE:GREGORIAN"].concat(ICS_ZONE);
+    list.forEach(function (x) {
+      out.push("BEGIN:VEVENT", "UID:" + x.id + "@visite-dedette", "DTSTAMP:" + stamp,
+        "DTSTART;TZID=Europe/Paris:" + compact(shift(x.date, x.time, 0)),
+        "DTEND;TZID=Europe/Paris:" + compact(shift(x.date, x.time, 60)),
+        "SUMMARY:" + icsText(TITLE), "LOCATION:" + icsText(PLACE), "DESCRIPTION:" + icsText(details(x)), "END:VEVENT");
+    });
+    out.push("END:VCALENDAR");
+    return out.join("\r\n");
+  }
+  function downloadIcs(v) {
+    var list = v.serie ? rest(v) : [v];
+    var blob = new Blob([icsFile(list)], { type: "text/calendar;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "visites-dedette.ics";
+    document.body.append(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
   function calPanel(v) {
     var copied = h("p", { class: "calnote", role: "status" }, "Pour Apple Agenda ou un autre agenda : copiez les détails et collez-les dans un nouvel événement.");
+    var n = v.serie ? rest(v).length : 1;
     return h("div", { class: "calpanel" },
-      h("p", { class: "calq" }, v.serie ? "Ajouter à mon agenda (Google Agenda ajoute toute la série)" : "Ajouter cette visite à mon agenda"),
+      h("p", { class: "calq" }, n > 1 ? "Ajouter les " + n + " visites à mon agenda" : "Ajouter cette visite à mon agenda"),
       h("div", { class: "calbtns" },
-        h("a", { class: "cbtn", href: googleUrl(v), target: "_blank", rel: "noopener" }, "Google Agenda"),
-        h("a", { class: "cbtn", href: outlookUrl(v), target: "_blank", rel: "noopener" }, "Outlook"),
+        h("button", { type: "button", class: "cbtn", onclick: function () { downloadIcs(v); } }, n > 1 ? "Toutes les visites (fichier agenda)" : "Fichier agenda"),
+        h("a", { class: "cbtn", href: googleUrl(v), target: "_blank", rel: "noopener" }, n > 1 ? "Google Agenda (toute la série)" : "Google Agenda"),
+        h("a", { class: "cbtn", href: outlookUrl(v), target: "_blank", rel: "noopener" }, n > 1 ? "Outlook (1re visite)" : "Outlook"),
         h("button", { type: "button", class: "cbtn", onclick: function () {
           var t = plainText(v);
           var ok = function () { copied.textContent = "Détails copiés. Collez-les dans votre agenda."; };
@@ -934,6 +970,33 @@ input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color:
   $("nameIn").value = lsGet("visite-nom");
   renderAll();
 
+  // Réparation des dates impossibles (ex. « 2026-09-31 ») créées par une ancienne version : on les
+  // ramène à la vraie date (1er octobre) pour l'affichage, et on recrée le document de son propriétaire.
+  function fixDate(o) {
+    var p = o.date.split("-").map(Number);
+    if (p.length !== 3) return o;
+    var e = new Date(p[0], p[1] - 1, p[2]), good = isoOf(e.getFullYear(), e.getMonth(), e.getDate());
+    if (good !== o.date) { o.badDate = o.date; o.date = good; }
+    return o;
+  }
+  var repairing = false;
+  async function repairDates(list) {
+    var bad = list.filter(function (o) { return o.badDate && o.uid === uid; });
+    if (!bad.length || repairing || !isMember) return;
+    repairing = true;
+    try {
+      var batch = db.batch();
+      bad.forEach(function (o) {
+        batch.delete(db.collection("visites").doc(o.id));
+        var data = { date: o.date, time: o.time, name: o.name, note: o.note || "", uid: o.uid, createdAt: o.createdAt || Date.now() };
+        if (o.serie) { data.serie = o.serie; data.every = o.every; }
+        batch.set(db.collection("visites").doc(), data);
+      });
+      await batch.commit();
+    } catch (e) { console.error(e); }
+    repairing = false;
+  }
+
   async function start() {
     try {
       firebase.initializeApp(firebaseConfig);
@@ -949,10 +1012,13 @@ input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color:
     $("codeWrap").hidden = isMember;
     renderAll();
     db.collection("visites").orderBy("date").limit(1000).onSnapshot(function (snap) {
-      rebuild(snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; })
-        .filter(function (o) { return typeof o.date === "string" && typeof o.name === "string"; }));
+      var list = snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; })
+        .filter(function (o) { return typeof o.date === "string" && typeof o.name === "string"; })
+        .map(fixDate);
+      rebuild(list);
       setBanner("");
       renderAll();
+      repairDates(list);
     }, function () {
       setBanner("La connexion au planning a été interrompue. Rechargez la page.", true);
     });
