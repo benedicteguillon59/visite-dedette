@@ -357,7 +357,7 @@ form h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; font-
 @media (max-width: 420px) { .row { grid-template-columns: 1fr; } }
 label { display: grid; gap: 4px; font-size: .88rem; font-weight: 600; color: var(--muted); }
 label[hidden] { display: none; }
-input[type="text"], input[type="time"] {
+input[type="text"], input[type="time"], select {
   transition: border-color .15s ease, box-shadow .15s ease;
   width: 100%;
   min-height: 48px;
@@ -382,7 +382,10 @@ input[type="text"], input[type="time"] {
 .submit:hover { filter: brightness(1.08); transform: translateY(-1px); }
 .submit:active { transform: translateY(0); }
 .submit:disabled { opacity: .55; cursor: default; }
-input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent); background: var(--surface); }
+select { appearance: auto; }
+.acts { flex-wrap: wrap; justify-content: flex-end; }
+.visit .note.rep { color: var(--accent); font-weight: 600; }
+input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color: var(--accent); background: var(--surface); }
 .msg { margin: 0; min-height: 1.3em; font-size: .92rem; color: var(--muted); }
 .msg.err { color: var(--danger); }
 .msg.ok { color: var(--accent); font-weight: 600; }
@@ -476,6 +479,24 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
               <input type="time" id="timeIn" value="14:00">
             </label>
           </div>
+          <div class="row" id="repeatRow">
+            <label for="repeatIn">Répétition
+              <select id="repeatIn">
+                <option value="0">Une seule fois</option>
+                <option value="7">Chaque semaine</option>
+                <option value="14">Toutes les 2 semaines</option>
+              </select>
+            </label>
+            <label for="repeatFor" id="repeatForWrap" hidden>Pendant
+              <select id="repeatFor">
+                <option value="4">1 mois</option>
+                <option value="8">2 mois</option>
+                <option value="13" selected>3 mois</option>
+                <option value="26">6 mois</option>
+              </select>
+            </label>
+          </div>
+          <p class="calnote" id="repeatHint" hidden></p>
           <button class="submit" id="submitBtn" type="submit">Je m’inscris</button>
           <p class="msg" id="formMsg" role="status"></p>
         </form>
@@ -560,12 +581,25 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
   }
   function compact(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00"; }
   function dashed(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":00"; }
+  var fmtDay = new Intl.DateTimeFormat("fr-FR", { weekday: "long" });
+  var fmtDM = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long" });
+  function addDays(iso, n) { var d = fromIso(iso); return isoOf(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function seriesDates(startIso, every, weeks) {
+    var n = every ? Math.max(1, Math.floor(weeks * 7 / every)) : 1, out = [];
+    for (var i = 0; i < n; i++) out.push(addDays(startIso, i * every));
+    return out;
+  }
+  function everyLabel(v) { return v.every === 14 ? "Toutes les 2 semaines" : "Chaque semaine"; }
+  function rest(v) {
+    return visits.filter(function (x) { return x.serie === v.serie && x.uid === v.uid && x.date >= v.date; });
+  }
   function details(v) { return "Inscrit(e) : " + v.name + (v.note ? "\n" + v.note : ""); }
   function googleUrl(v) {
     return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
       "&text=" + encodeURIComponent(TITLE) +
       "&dates=" + compact(shift(v.date, v.time, 0)) + "/" + compact(shift(v.date, v.time, 60)) +
       "&ctz=Europe%2FParis&location=" + encodeURIComponent(PLACE) +
+      (v.serie ? "&recur=" + encodeURIComponent("RRULE:FREQ=WEEKLY;INTERVAL=" + (v.every === 14 ? 2 : 1) + ";COUNT=" + rest(v).length) : "") +
       "&details=" + encodeURIComponent(details(v));
   }
   function outlookUrl(v) {
@@ -582,7 +616,7 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
   function calPanel(v) {
     var copied = h("p", { class: "calnote", role: "status" }, "Pour Apple Agenda ou un autre agenda : copiez les détails et collez-les dans un nouvel événement.");
     return h("div", { class: "calpanel" },
-      h("p", { class: "calq" }, "Ajouter cette visite à mon agenda"),
+      h("p", { class: "calq" }, v.serie ? "Ajouter à mon agenda (Google Agenda ajoute toute la série)" : "Ajouter cette visite à mon agenda"),
       h("div", { class: "calbtns" },
         h("a", { class: "cbtn", href: googleUrl(v), target: "_blank", rel: "noopener" }, "Google Agenda"),
         h("a", { class: "cbtn", href: outlookUrl(v), target: "_blank", rel: "noopener" }, "Outlook"),
@@ -595,10 +629,25 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
       copied);
   }
   function firstName(n) { return String(n || "").split(" ")[0]; }
+  var toneOf = new Map();
+  var nameKey = function (name) { return String(name || "").trim().toLowerCase(); };
   function tone(name) {
-    var s = String(name || "").trim().toLowerCase(), x = 0;
-    for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 997;
+    var k = nameKey(name);
+    if (toneOf.has(k)) return toneOf.get(k);
+    var x = 0;
+    for (var i = 0; i < k.length; i++) x = (x * 31 + k.charCodeAt(i)) % 997;
     return x % 10;
+  }
+  // Chaque personne prend la couleur suivante, dans l'ordre de sa première inscription :
+  // deux personnes n'ont donc jamais la même couleur tant qu'elles sont moins de 10.
+  function assignTones(list) {
+    toneOf = new Map();
+    list.slice().sort(function (a, b) {
+      return (a.createdAt || 0) - (b.createdAt || 0) || nameKey(a.name).localeCompare(nameKey(b.name));
+    }).forEach(function (v) {
+      var k = nameKey(v.name);
+      if (!toneOf.has(k)) toneOf.set(k, toneOf.size % 10);
+    });
   }
   function initials(name) {
     var w = String(name || "").trim().split(/\s+/).filter(Boolean);
@@ -616,6 +665,7 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
   }
 
   function rebuild(list) {
+    assignTones(list);
     visits = list.slice().sort(function (a, b) {
       return (a.date + " " + (a.time || "")).localeCompare(b.date + " " + (b.time || ""));
     });
@@ -680,7 +730,10 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
       var del = null;
       if (canDel) {
         del = confirmId === v.id
-          ? h("button", { type: "button", class: "link-btn confirm", onclick: function () { removeVisit(v); } }, "Confirmer ?")
+          ? (v.serie && rest(v).length > 1
+            ? [h("button", { type: "button", class: "link-btn confirm", onclick: function () { removeVisit(v); } }, "Celle-ci seulement"),
+               h("button", { type: "button", class: "link-btn confirm", onclick: function () { removeSeries(v); } }, "Celle-ci et les suivantes")]
+            : h("button", { type: "button", class: "link-btn confirm", onclick: function () { removeVisit(v); } }, "Confirmer ?"))
           : h("button", { type: "button", class: "link-btn", "aria-label": "Annuler l’inscription de " + v.name, onclick: function () { confirmId = v.id; renderDay(); } }, "Annuler");
       }
       var calBtn = isMine(v) && v.date >= todayIso
@@ -692,6 +745,7 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
         h("span", { class: "who" }, avatar(v.name), h("span", null, v.name), isMine(v) ? h("span", { class: "badge" }, "Vous") : null),
         h("span", { class: "acts" }, calBtn, del),
         v.note ? h("span", { class: "note" }, v.note) : null,
+        v.serie ? h("span", { class: "note rep" }, "Visite répétée : " + everyLabel(v).toLowerCase()) : null,
         calFor === v.id && isMine(v) ? calPanel(v) : null));
     });
     if (scrollToPanel) {
@@ -699,6 +753,7 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
       if (pnl) { scrollToPanel = false; pnl.scrollIntoView({ block: "nearest" }); }
     }
 
+    updateRepeatHint();
     var past = selected < todayIso;
     var noWrite = !db || canWrite === false;
     $("form").hidden = past || noWrite;
@@ -753,6 +808,37 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
     }
   }
 
+  async function removeSeries(v) {
+    if (!db) return;
+    try {
+      var batch = db.batch();
+      rest(v).forEach(function (x) { batch.delete(db.collection("visites").doc(x.id)); });
+      await batch.commit();
+      confirmId = null;
+      say("Les visites ont été annulées.", "ok");
+    } catch (e) {
+      confirmId = null;
+      renderDay();
+      say("L’annulation a échoué. Réessayez dans un instant.", "err");
+    }
+  }
+
+  function repeatPlan() {
+    var every = +$("repeatIn").value, weeks = +$("repeatFor").value;
+    return { every: every, dates: seriesDates(selected, every, weeks) };
+  }
+  function updateRepeatHint() {
+    var plan = repeatPlan(), on = plan.every > 0;
+    $("repeatForWrap").hidden = !on;
+    var hint = $("repeatHint");
+    hint.hidden = !on;
+    if (!on) return;
+    var d = plan.dates, last = d[d.length - 1];
+    hint.textContent = d.length + " visites : " + (plan.every === 14 ? "un " : "chaque ") + fmtDay.format(fromIso(selected)) +
+      (plan.every === 14 ? " sur deux" : "") + " à " + hhmm($("timeIn").value || "14:00") + ", du " + fmtDM.format(fromIso(selected)) + " au " + fmtDM.format(fromIso(last)) + ".";
+  }
+  ["repeatIn", "repeatFor", "timeIn"].forEach(function (id) { $(id).addEventListener("input", updateRepeatHint); });
+
   $("form").addEventListener("submit", async function (e) {
     e.preventDefault();
     if (!db || busy) return;
@@ -761,10 +847,13 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
     var note = $("noteIn").value.trim();
     if (name.length < 2) { say("Indiquez votre nom pour vous inscrire.", "err"); $("nameIn").focus(); return; }
     if (!time) { say("Choisissez une heure de visite.", "err"); $("timeIn").focus(); return; }
-    var dup = (byDate.get(selected) || []).some(function (v) {
-      return v.name.toLowerCase() === name.toLowerCase() && v.time === time;
-    });
-    if (dup) { say("Vous êtes déjà inscrit à cette heure ce jour-là.", "err"); return; }
+    var plan = repeatPlan();
+    var isTaken = function (iso) {
+      return (byDate.get(iso) || []).some(function (v) { return v.name.toLowerCase() === name.toLowerCase() && v.time === time; });
+    };
+    var dates = plan.dates.filter(function (iso) { return !isTaken(iso); });
+    var skipped = plan.dates.length - dates.length;
+    if (!dates.length) { say(plan.every ? "Vous êtes déjà inscrit à toutes ces dates." : "Vous êtes déjà inscrit à cette heure ce jour-là.", "err"); return; }
     busy = true;
     $("submitBtn").disabled = true;
     say("Enregistrement…");
@@ -782,13 +871,25 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
         isMember = true;
         $("codeWrap").hidden = true;
       }
-      var ref = await db.collection("visites").add({ date: selected, time: time, name: name, note: note, uid: uid, createdAt: Date.now() });
+      var serie = plan.every ? Date.now().toString(36) + Math.random().toString(36).slice(2, 8) : null;
+      var batch = db.batch(), ids = [];
+      dates.forEach(function (iso) {
+        var r = db.collection("visites").doc();
+        var data = { date: iso, time: time, name: name, note: note, uid: uid, createdAt: Date.now() };
+        if (serie) { data.serie = serie; data.every = plan.every; }
+        batch.set(r, data);
+        ids.push(r.id);
+      });
+      await batch.commit();
       lsSet("visite-nom", name);
       $("noteIn").value = "";
-      mineIds.add(ref.id);
-      calFor = ref.id;
+      $("repeatIn").value = "0";
+      ids.forEach(function (id) { mineIds.add(id); });
+      calFor = ids[0];
       scrollToPanel = true;
-      say("C’est enregistré : " + fmtLong.format(fromIso(selected)) + " à " + hhmm(time) + ". Ajoutez-la à votre agenda dans la liste ci-dessus.", "ok");
+      say(dates.length > 1
+        ? "C’est enregistré : " + dates.length + " visites à " + hhmm(time) + (skipped ? " (" + skipped + " déjà inscrite" + (skipped > 1 ? "s" : "") + ")" : "") + ". Ajoutez-les à votre agenda dans la liste ci-dessus."
+        : "C’est enregistré : " + fmtLong.format(fromIso(dates[0])) + " à " + hhmm(time) + ". Ajoutez-la à votre agenda dans la liste ci-dessus.", "ok");
       renderDay();
     } catch (err) {
       say("L’inscription n’a pas pu être enregistrée. Réessayez dans un instant.", "err");
