@@ -109,23 +109,14 @@ button { cursor: pointer; }
 header.hero {
   position: relative;
   overflow: hidden;
-  padding: 24px 88px 26px 22px;
+  padding: 24px 100px 26px 22px;
   border-radius: 24px;
   background: linear-gradient(135deg, var(--hero), var(--hero-2));
   box-shadow: var(--shadow);
 }
-header.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 93% 24%, var(--c0) 0 13px, transparent 14px),
-    radial-gradient(circle at 82% 68%, var(--c2) 0 8px, transparent 9px),
-    radial-gradient(circle at 96% 78%, var(--c1) 0 17px, transparent 18px),
-    radial-gradient(circle at 78% 22%, var(--c4) 0 6px, transparent 7px),
-    radial-gradient(circle at 88% 92%, var(--c3) 0 7px, transparent 8px);
-}
+.hero-art { position: absolute; right: 12px; top: 50%; width: 84px; height: auto; transform: translateY(-50%); pointer-events: none; }
+@media (min-width: 600px) { .hero-art { right: 32px; width: 150px; } }
+@media (max-width: 420px) { header.hero { padding-right: 22px; } .hero-art { top: 16px; right: 14px; width: 64px; transform: none; } header h1 { padding-right: 62px; } }
 header h1 {
   font-family: var(--font-display);
   font-weight: 700;
@@ -225,6 +216,8 @@ h2 {
 /* Calendar */
 .cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .cal-head h2 { flex: 1; text-align: center; text-transform: capitalize; font-size: 1.25rem; }
+@media (max-width: 420px) { .cal-head { gap: 6px; } .cal-head h2 { font-size: 1rem; min-width: 0; } .nav { width: 38px; } .today-btn { padding-inline: 8px; font-size: .82rem; } }
+.layout > *, .side > * { min-width: 0; }
 .nav {
   width: 44px; height: 44px;
   border: 1px solid var(--line);
@@ -255,6 +248,7 @@ h2 {
   padding-bottom: 4px;
 }
 .dow span:nth-child(n+6) { color: var(--wk); }
+.cell:not(.blank):not(.past):hover { box-shadow: 0 4px 12px rgba(21, 48, 47, .12); }
 .cell {
   position: relative;
   min-height: 72px;
@@ -296,9 +290,10 @@ h2 {
 .names > span { display: flex; align-items: center; gap: 5px; min-width: 0; }
 .names .txt { display: none; }
 .names .more { font-weight: 600; }
+.cell:has(.pill):not(.selected) { background: var(--soft); }
 .cell.selected { background: var(--pop-soft); border-color: var(--cta); box-shadow: inset 0 0 0 2px var(--cta); }
 @media (min-width: 600px) {
-  .cell { min-height: 96px; padding: 8px 8px; }
+  .cell { min-height: 104px; padding: 10px 10px; }
   .names { display: grid; gap: 2px; }
   .names .txt { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
@@ -421,6 +416,17 @@ input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent)
 
 <main class="app">
   <header class="hero">
+    <svg class="hero-art" viewBox="0 0 150 140" aria-hidden="true">
+      <circle cx="112" cy="34" r="26" fill="#fff6cf"/>
+      <circle cx="112" cy="34" r="16" fill="#ffffff" opacity=".7"/>
+      <ellipse cx="75" cy="124" rx="62" ry="8" fill="#15302f" opacity=".14"/>
+      <path d="M12 68 L75 16 L138 68 Z" fill="#1d6b66"/>
+      <rect x="24" y="64" width="102" height="58" rx="8" fill="#1d6b66"/>
+      <rect x="100" y="24" width="14" height="30" rx="3" fill="#15302f"/>
+      <path d="M75 108 C 52 94, 46 80, 55 73 C 62 67, 71 70, 75 78 C 79 70, 88 67, 95 73 C 104 80, 98 94, 75 108 Z" fill="#ff6b52"/>
+      <circle cx="18" cy="112" r="6" fill="#b8358a"/><circle cx="30" cy="118" r="5" fill="#6b4fd8"/>
+      <circle cx="134" cy="114" r="6" fill="#d9432b"/><circle cx="124" cy="119" r="4" fill="#2470c4"/>
+    </svg>
     <p class="eyebrow">Planning partagé</p>
     <h1>Visite à Dédette</h1>
     <p class="sub">Qui passe la voir ? Choisissez un jour et inscrivez-vous.</p>
