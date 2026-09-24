@@ -764,10 +764,26 @@ input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color:
     else lock.hidden = true;
   }
 
+  // Une visite reste « à venir » jusqu'à la fin de son heure (durée 1 h).
+  function isUpcoming(v) {
+    if (v.date !== todayIso) return v.date > todayIso;
+    var n = new Date();
+    var p = (v.time || "23:59").split(":");
+    return (+p[0]) * 60 + (+p[1]) + 60 > n.getHours() * 60 + n.getMinutes();
+  }
+
+  function refreshToday() {
+    var n = new Date(), iso = isoOf(n.getFullYear(), n.getMonth(), n.getDate());
+    if (iso !== todayIso) { now = n; todayIso = iso; renderAll(); }
+    else renderUpcoming();
+  }
+  setInterval(refreshToday, 60000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) refreshToday(); });
+
   function renderUpcoming() {
     var ul = $("upList");
     ul.replaceChildren();
-    var up = visits.filter(function (v) { return v.date >= todayIso; }).slice(0, 30);
+    var up = visits.filter(isUpcoming).slice(0, 30);
     if (!up.length) {
       ul.append(h("li", null, h("p", { class: "empty" }, "Aucune visite à venir pour le moment.")));
       return;
