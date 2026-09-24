@@ -583,7 +583,11 @@ input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color:
   function dashed(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":00"; }
   var fmtDay = new Intl.DateTimeFormat("fr-FR", { weekday: "long" });
   var fmtDM = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long" });
-  function addDays(iso, n) { var d = fromIso(iso); return isoOf(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function addDays(iso, n) {
+    var d = fromIso(iso);
+    var e = new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+    return isoOf(e.getFullYear(), e.getMonth(), e.getDate());
+  }
   function seriesDates(startIso, every, weeks) {
     var n = every ? Math.max(1, Math.floor(weeks * 7 / every)) : 1, out = [];
     for (var i = 0; i < n; i++) out.push(addDays(startIso, i * every));
@@ -888,19 +892,22 @@ input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color:
         $("codeWrap").hidden = true;
       }
       var serie = plan.every ? Date.now().toString(36) + Math.random().toString(36).slice(2, 8) : null;
-      var batch = db.batch(), ids = [];
-      dates.forEach(function (iso) {
-        var r = db.collection("visites").doc();
+      var ids = [];
+      var docs = dates.map(function (iso) {
         var data = { date: iso, time: time, name: name, note: note, uid: uid, createdAt: Date.now() };
         if (serie) { data.serie = serie; data.every = plan.every; }
-        batch.set(r, data);
-        ids.push(r.id);
+        return { ref: db.collection("visites").doc(), data: data };
       });
-      await batch.commit();
+      // Envoi par petits lots : Firebase limite le nombre de vérifications de règles par lot.
+      for (var i = 0; i < docs.length; i += 8) {
+        var batch = db.batch();
+        docs.slice(i, i + 8).forEach(function (d) { batch.set(d.ref, d.data); });
+        await batch.commit();
+        docs.slice(i, i + 8).forEach(function (d) { ids.push(d.ref.id); mineIds.add(d.ref.id); });
+      }
       lsSet("visite-nom", name);
       $("noteIn").value = "";
       $("repeatIn").value = "0";
-      ids.forEach(function (id) { mineIds.add(id); });
       calFor = ids[0];
       scrollToPanel = true;
       say(dates.length > 1
@@ -908,7 +915,10 @@ input[type="text"]:focus, input[type="time"]:focus, select:focus { border-color:
         : "C’est enregistré : " + fmtLong.format(fromIso(dates[0])) + " à " + hhmm(time) + ". Ajoutez-la à votre agenda dans la liste ci-dessus.", "ok");
       renderDay();
     } catch (err) {
-      say("L’inscription n’a pas pu être enregistrée. Réessayez dans un instant.", "err");
+      console.error(err);
+      say("L’inscription n’a pas pu être enregistrée. Réessayez dans un instant." +
+        (ids && ids.length ? " " + ids.length + " visite" + (ids.length > 1 ? "s ont" : " a") + " déjà été enregistrée" + (ids.length > 1 ? "s" : "") + "." : "") +
+        (err && err.code ? " (code : " + err.code + ")" : ""), "err");
     } finally {
       busy = false;
       $("submitBtn").disabled = false;
