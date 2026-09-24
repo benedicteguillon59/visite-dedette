@@ -9,9 +9,15 @@ Application web mobile (Android et iPhone) : un calendrier partagé où chacun v
 - `firestore.rules` : copie des règles de sécurité Firestore. Le code d'accès y est remplacé par `CHANGER-MOI` ; le vrai code n'existe que dans la console Firebase.
 - `.claude/launch.json` : lance un serveur local (`python -m http.server 8765`) pour tester.
 
+## Look : « Le potager de Dédette »
+
+Dédette est une mamie, ancienne agricultrice : le graphisme vient de son monde. Fond vert prairie à sillons, cartes en sachets de graines (bord festonné coquelicot / blé / bleuet), tournesol dessiné dans l'en-tête, plaque « Chambre 364 » sur un piquet de jardin, jour choisi dans un rond jaune blé. Polices : Fredoka (titres) et Atkinson Hyperlegible (texte), via Google Fonts. Mode sombre : terre de nuit. Les couleurs sont des variables en haut du `<style>`.
+
+Règles à garder (l'appli est utilisée par des personnes âgées) : texte courant d'au moins 16 px (18 px de base), contraste d'au moins 4,5, zones à toucher d'au moins 44 px, et toucher un jour amène au formulaire sur téléphone. Avant de changer le look, vérifier ces points.
+
 ## Fonctions
 
-- Calendrier mensuel (lundi en premier), pastilles de couleur par inscrit (10 couleurs, choisies d'après le nom), jour actuel en corail.
+- Calendrier mensuel (lundi en premier), pastilles de couleur par inscrit (10 couleurs, choisies d'après le nom), jour actuel entouré de jaune blé.
 - Panneau du jour : liste des inscrits (heure, nom, précision) et formulaire d'inscription (nom, code d'accès à la première fois, heure, précision facultative).
 - Annulation de sa propre inscription (double clic de confirmation, sans boîte de dialogue).
 - Après inscription : boutons « Google Agenda », « Outlook » et « Copier les détails » (durée 1 h, fuseau Europe/Paris).
