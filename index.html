@@ -1,0 +1,802 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visite à Dédette</title>
+<meta name="theme-color" content="#ffd45c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dédette">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #eef2f1;
+  --surface: #ffffff;
+  --ink: #17282a;
+  --muted: #566a6c;
+  --line: #d3dddb;
+  --soft: #e1ecea;
+  --accent: #1d6b66;
+  --accent-ink: #ffffff;
+  --mine: #a85512;
+  --mine-bg: #fbeadb;
+  --danger: #a32b2b;
+  --hero: #ffd45c;
+  --pop-soft: #fff0bd;
+  --cta: #d9432b;
+  --cta-ink: #ffffff;
+  --wk: #c2371f;
+  --c0: #d9432b;
+  --c1: #6b4fd8;
+  --c2: #1d7f78;
+  --c3: #2470c4;
+  --c4: #b8358a;
+  --c5: #2f7d3b;
+  --c6: #8a5a2b;
+  --c7: #6b7a0a;
+  --c8: #b8650a;
+  --c9: #4e5d78;
+  --shadow: 0 1px 2px rgba(23, 40, 42, .06), 0 6px 20px rgba(23, 40, 42, .06);
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f191a;
+    --surface: #172527;
+    --ink: #e6efee;
+    --muted: #93a8a9;
+    --line: #2a3d3f;
+    --soft: #1e3335;
+    --accent: #5fbdb5;
+    --accent-ink: #0c1b1c;
+    --mine: #f0a868;
+    --mine-bg: #3a2a1b;
+    --danger: #f08a8a;
+    --hero: #3b3213;
+    --pop-soft: #3a3113;
+    --cta: #ff7a63;
+    --cta-ink: #2a0f0a;
+    --wk: #ff8a75;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f191a;
+  --surface: #172527;
+  --ink: #e6efee;
+  --muted: #93a8a9;
+  --line: #2a3d3f;
+  --soft: #1e3335;
+  --accent: #5fbdb5;
+  --accent-ink: #0c1b1c;
+  --mine: #f0a868;
+  --mine-bg: #3a2a1b;
+  --danger: #f08a8a;
+  --hero: #3b3213;
+  --pop-soft: #3a3113;
+  --cta: #ff7a63;
+  --cta-ink: #2a0f0a;
+  --wk: #ff8a75;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  padding-inline: 16px;
+  padding-block: 20px 40px;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.app { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+header.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 22px 88px 24px 20px;
+  border-radius: 16px;
+  background: var(--hero);
+}
+header.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 93% 24%, var(--c0) 0 13px, transparent 14px),
+    radial-gradient(circle at 82% 68%, var(--c2) 0 8px, transparent 9px),
+    radial-gradient(circle at 96% 78%, var(--c1) 0 17px, transparent 18px),
+    radial-gradient(circle at 78% 22%, var(--c4) 0 6px, transparent 7px),
+    radial-gradient(circle at 88% 92%, var(--c3) 0 7px, transparent 8px);
+}
+header h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 6vw, 2.7rem);
+  line-height: 1.05;
+  margin: 0;
+  text-wrap: balance;
+}
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: .75;
+}
+.sub { margin: 8px 0 0; font-size: 1.02rem; max-width: 34ch; }
+.place { margin: 10px 0 0; font-size: .95rem; font-weight: 600; }
+.hero-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; position: relative; z-index: 1; }
+.maplink {
+  display: inline-flex; align-items: center;
+  min-height: 44px; padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600; font-size: .95rem;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+}
+.maplink:hover { background: var(--soft); }
+.av {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  background: var(--c0);
+}
+.av.c1 { background: var(--c1); }
+.av.c2 { background: var(--c2); }
+.av.c3 { background: var(--c3); }
+.av.c4 { background: var(--c4); }
+.av.c5 { background: var(--c5); }
+.av.c6 { background: var(--c6); }
+.av.c7 { background: var(--c7); }
+.av.c8 { background: var(--c8); }
+.av.c9 { background: var(--c9); }
+.av.sm { width: 10px; height: 10px; }
+.banner {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: .95rem;
+}
+.banner.warn { background: var(--mine-bg); color: var(--mine); }
+
+.layout { display: grid; gap: 20px; align-items: start; }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+}
+.side { display: grid; gap: 20px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* Calendar */
+.cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.cal-head h2 { flex: 1; text-align: center; text-transform: capitalize; font-size: 1.25rem; }
+.nav {
+  width: 44px; height: 44px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 10px;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.nav:hover { background: var(--soft); }
+.today-btn {
+  height: 44px;
+  padding-inline: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 10px;
+  font-size: .9rem;
+  font-weight: 500;
+}
+.today-btn:hover { background: var(--soft); }
+.dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.dow span {
+  text-align: center;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 4px;
+}
+.dow span:nth-child(n+6) { color: var(--wk); }
+.cell {
+  position: relative;
+  min-height: 72px;
+  padding: 6px 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.cell:hover { background: var(--soft); }
+.cell.blank { border: 0; background: transparent; pointer-events: none; }
+.cell.past .num { color: var(--muted); }
+.cell.past { opacity: .7; }
+.cell .num { font-weight: 600; font-size: .95rem; font-variant-numeric: tabular-nums; }
+.cell.is-today .num {
+  display: inline-grid; place-items: center;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--cta); color: var(--cta-ink);
+}
+.pill {
+  align-self: flex-start;
+  margin-top: auto;
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: .78rem;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.cell.has-mine .pill { background: var(--mine); color: var(--surface); }
+.names { display: flex; flex-wrap: wrap; gap: 3px; font-size: .72rem; line-height: 1.2; color: var(--muted); }
+.names > span { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.names .txt { display: none; }
+.names .more { font-weight: 600; }
+.cell.selected { background: var(--pop-soft); border-color: var(--cta); box-shadow: inset 0 0 0 2px var(--cta); }
+@media (min-width: 600px) {
+  .cell { min-height: 96px; padding: 8px 8px; }
+  .names { display: grid; gap: 2px; }
+  .names .txt { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* Day panel */
+.day-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; }
+.day-head h2 { text-transform: capitalize; }
+.day-head p { margin: 0; color: var(--muted); font-size: .92rem; }
+ul.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.visit {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.visit.mine { background: var(--mine-bg); border-color: transparent; }
+.visit .t { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 3.2em; }
+.visit .who { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.visit .note { grid-column: 2 / 3; font-size: .9rem; color: var(--muted); overflow-wrap: anywhere; }
+.visit .badge { font-size: .72rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--mine); margin-left: 6px; }
+.link-btn {
+  border: 0; background: none; padding: 8px 6px;
+  font-size: .9rem; font-weight: 500; color: var(--danger);
+  text-decoration: underline; text-underline-offset: 3px;
+  min-height: 40px;
+}
+.link-btn.confirm { font-weight: 600; }
+.acts { display: flex; align-items: center; gap: 2px; }
+.link-btn.cal { color: var(--accent); }
+.calpanel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.calq { margin: 0; font-size: .9rem; font-weight: 600; }
+.calbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+.cbtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: 8px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--accent);
+  font-weight: 600; font-size: .95rem;
+  text-decoration: none;
+}
+.cbtn:hover { background: var(--soft); }
+.calnote { margin: 0; font-size: .82rem; color: var(--muted); }
+.empty { margin: 0; padding: 14px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: .95rem; }
+
+form { display: grid; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+form h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; }
+.row { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) minmax(0, 9.5rem); }
+@media (max-width: 420px) { .row { grid-template-columns: 1fr; } }
+label { display: grid; gap: 4px; font-size: .88rem; font-weight: 600; color: var(--muted); }
+label[hidden] { display: none; }
+input[type="text"], input[type="time"] {
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 400;
+}
+.submit {
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--cta);
+  color: var(--cta-ink);
+  font-weight: 600;
+  font-size: 1rem;
+  padding-inline: 18px;
+}
+.submit:hover { filter: brightness(1.08); }
+.submit:disabled { opacity: .55; cursor: default; }
+.msg { margin: 0; min-height: 1.3em; font-size: .92rem; color: var(--muted); }
+.msg.err { color: var(--danger); }
+.msg.ok { color: var(--accent); font-weight: 600; }
+
+/* Upcoming */
+.up {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 5.6rem minmax(0, 1fr);
+  gap: 2px 10px;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.up:hover { background: var(--soft); }
+.up.mine { background: var(--mine-bg); border-color: transparent; }
+.up .d { font-weight: 600; text-transform: capitalize; font-variant-numeric: tabular-nums; }
+.up .w { overflow-wrap: anywhere; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.up .w small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.legend { margin: 12px 0 0; font-size: .82rem; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--accent); }
+.legend i.m { background: var(--mine); }
+@media (prefers-reduced-motion: no-preference) {
+  .cell, .up, .nav, .today-btn { transition: background-color .15s ease; }
+}
+</style>
+
+<main class="app">
+  <header class="hero">
+    <p class="eyebrow">Planning partagé</p>
+    <h1>Visite à Dédette</h1>
+    <p class="sub">Qui passe la voir ? Choisissez un jour et inscrivez-vous.</p>
+    <p class="place">Résidence Les Hauts d’Amandie, Faches-Thumesnil</p>
+    <div class="hero-links">
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=R%C3%A9sidence%20Les%20Hauts%20d%27Amandie%20Faches-Thumesnil" target="_blank" rel="noopener">Voir sur la carte</a>
+      <a class="maplink" href="https://www.google.com/maps/dir/?api=1&amp;destination=R%C3%A9sidence%20Les%20Hauts%20d%27Amandie%20Faches-Thumesnil" target="_blank" rel="noopener">Itinéraire</a>
+    </div>
+  </header>
+
+  <p class="banner" id="banner" role="status">Chargement du planning…</p>
+
+  <div class="layout">
+    <section class="card" aria-label="Calendrier des visites">
+      <div class="cal-head">
+        <button class="nav" id="prev" type="button" aria-label="Mois précédent">‹</button>
+        <h2 id="monthTitle"></h2>
+        <button class="nav" id="next" type="button" aria-label="Mois suivant">›</button>
+        <button class="today-btn" id="todayBtn" type="button">Aujourd’hui</button>
+      </div>
+      <div class="dow" aria-hidden="true"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
+      <div class="grid" id="grid"></div>
+      <p class="legend"><span><i></i>Visites prévues</span><span><i class="m"></i>Dont une inscription à vous</span></p>
+    </section>
+
+    <div class="side">
+      <section class="card" id="day" aria-labelledby="dayTitle">
+        <div class="day-head">
+          <h2 id="dayTitle"></h2>
+          <p id="daySub"></p>
+        </div>
+        <ul class="list" id="dayList"></ul>
+
+        <form id="form" novalidate>
+          <h3>Je m’inscris pour une visite</h3>
+          <label for="nameIn">Votre nom
+            <input type="text" id="nameIn" autocomplete="name" maxlength="60" placeholder="Prénom Nom">
+          </label>
+          <label for="codeIn" id="codeWrap" hidden>Code d’accès (donné par l’organisateur)
+            <input type="text" id="codeIn" autocomplete="off" autocapitalize="off" maxlength="40" placeholder="Le code de la famille">
+          </label>
+          <div class="row">
+            <label for="noteIn">Précision (facultatif)
+              <input type="text" id="noteIn" maxlength="80" placeholder="Un mot, si besoin">
+            </label>
+            <label for="timeIn">Heure
+              <input type="time" id="timeIn" value="14:00">
+            </label>
+          </div>
+          <button class="submit" id="submitBtn" type="submit">Je m’inscris</button>
+          <p class="msg" id="formMsg" role="status"></p>
+        </form>
+        <p class="msg" id="lockMsg" hidden></p>
+      </section>
+
+      <section class="card" aria-labelledby="upTitle">
+        <h2 id="upTitle" style="margin-bottom:12px">Prochaines visites</h2>
+        <ul class="list" id="upList"></ul>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function h(tag, attrs) {
+    var e = document.createElement(tag);
+    var a = attrs || {};
+    Object.keys(a).forEach(function (k) {
+      var v = a[k];
+      if (v === false || v == null) return;
+      if (k === "class") e.className = v;
+      else if (k.indexOf("on") === 0) e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v === true ? "" : v);
+    });
+    var add = function (c) {
+      if (c == null || c === false) return;
+      if (Array.isArray(c)) { c.forEach(add); return; }
+      e.append(c.nodeType ? c : document.createTextNode(String(c)));
+    };
+    for (var i = 2; i < arguments.length; i++) add(arguments[i]);
+    return e;
+  }
+
+  var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  var isoOf = function (y, m, d) { return y + "-" + pad(m + 1) + "-" + pad(d); };
+  var fromIso = function (s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
+  var fmtLong = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  var fmtShort = new Intl.DateTimeFormat("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+  var fmtMonth = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" });
+  var hhmm = function (t) { return (t || "").replace(":", "h"); };
+
+  var now = new Date();
+  var todayIso = isoOf(now.getFullYear(), now.getMonth(), now.getDate());
+  var viewY = now.getFullYear(), viewM = now.getMonth();
+  var selected = todayIso;
+
+  // Configuration Firebase : ces valeurs ne sont pas secrètes, ce sont les règles Firestore qui protègent les données.
+  var firebaseConfig = {
+    apiKey: "AIzaSyC7BphaGLj-0YEJA5AR8ltpgWF-qTAYb6s",
+    authDomain: "visite-dedette.firebaseapp.com",
+    projectId: "visite-dedette",
+    storageBucket: "visite-dedette.firebasestorage.app",
+    messagingSenderId: "1008498676351",
+    appId: "1:1008498676351:web:4fb47f9e63107f6f63a54a"
+  };
+
+  var db = null, uid = null, canWrite = null, isMember = false;
+  var visits = [];
+  var byDate = new Map();
+  var confirmId = null;
+  var busy = false;
+  var mineIds = new Set();
+  var calFor = null;
+  var scrollToPanel = false;
+  var TITLE = "Visite à Dédette";
+
+  function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  function isMine(v) { return (!!uid && v.uid === uid) || mineIds.has(v.id); }
+
+  function shift(iso, t, addMin) {
+    var p = iso.split("-"), q = (t || "14:00").split(":");
+    return new Date(+p[0], +p[1] - 1, +p[2], +q[0], +q[1] + addMin);
+  }
+  function compact(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00"; }
+  function dashed(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":00"; }
+  function details(v) { return "Inscrit(e) : " + v.name + (v.note ? "\n" + v.note : ""); }
+  function googleUrl(v) {
+    return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+      "&text=" + encodeURIComponent(TITLE) +
+      "&dates=" + compact(shift(v.date, v.time, 0)) + "/" + compact(shift(v.date, v.time, 60)) +
+      "&ctz=Europe%2FParis&details=" + encodeURIComponent(details(v));
+  }
+  function outlookUrl(v) {
+    return "https://outlook.live.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent" +
+      "&subject=" + encodeURIComponent(TITLE) +
+      "&startdt=" + encodeURIComponent(dashed(shift(v.date, v.time, 0))) +
+      "&enddt=" + encodeURIComponent(dashed(shift(v.date, v.time, 60))) +
+      "&body=" + encodeURIComponent(details(v));
+  }
+  function plainText(v) {
+    return TITLE + " : " + fmtLong.format(fromIso(v.date)) + " à " + hhmm(v.time) + (v.note ? " (" + v.note + ")" : "");
+  }
+  function calPanel(v) {
+    var copied = h("p", { class: "calnote", role: "status" }, "Pour Apple Agenda ou un autre agenda : copiez les détails et collez-les dans un nouvel événement.");
+    return h("div", { class: "calpanel" },
+      h("p", { class: "calq" }, "Ajouter cette visite à mon agenda"),
+      h("div", { class: "calbtns" },
+        h("a", { class: "cbtn", href: googleUrl(v), target: "_blank", rel: "noopener" }, "Google Agenda"),
+        h("a", { class: "cbtn", href: outlookUrl(v), target: "_blank", rel: "noopener" }, "Outlook"),
+        h("button", { type: "button", class: "cbtn", onclick: function () {
+          var t = plainText(v);
+          var ok = function () { copied.textContent = "Détails copiés. Collez-les dans votre agenda."; };
+          var ko = function () { copied.textContent = t; };
+          try { navigator.clipboard.writeText(t).then(ok, ko); } catch (e) { ko(); }
+        } }, "Copier les détails")),
+      copied);
+  }
+  function firstName(n) { return String(n || "").split(" ")[0]; }
+  function tone(name) {
+    var s = String(name || "").trim().toLowerCase(), x = 0;
+    for (var i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 997;
+    return x % 10;
+  }
+  function initials(name) {
+    var w = String(name || "").trim().split(/\s+/).filter(Boolean);
+    return ((w[0] ? w[0][0] : "?") + (w[1] ? w[1][0] : "")).toUpperCase();
+  }
+  function avatar(name) {
+    return h("span", { class: "av c" + tone(name), "aria-hidden": "true" }, initials(name));
+  }
+
+  function setBanner(text, warn) {
+    var b = $("banner");
+    b.hidden = !text;
+    b.textContent = text || "";
+    b.className = "banner" + (warn ? " warn" : "");
+  }
+
+  function rebuild(list) {
+    visits = list.slice().sort(function (a, b) {
+      return (a.date + " " + (a.time || "")).localeCompare(b.date + " " + (b.time || ""));
+    });
+    byDate = new Map();
+    visits.forEach(function (v) {
+      if (!byDate.has(v.date)) byDate.set(v.date, []);
+      byDate.get(v.date).push(v);
+    });
+  }
+
+  function renderCal() {
+    $("monthTitle").textContent = fmtMonth.format(new Date(viewY, viewM, 1));
+    var grid = $("grid");
+    grid.replaceChildren();
+    var offset = (new Date(viewY, viewM, 1).getDay() + 6) % 7;
+    var days = new Date(viewY, viewM + 1, 0).getDate();
+    for (var i = 0; i < offset; i++) grid.append(h("div", { class: "cell blank", "aria-hidden": "true" }));
+    for (var d = 1; d <= days; d++) {
+      (function (d) {
+        var iso = isoOf(viewY, viewM, d);
+        var list = byDate.get(iso) || [];
+        var mine = list.some(isMine);
+        var cls = "cell" +
+          (iso === todayIso ? " is-today" : "") +
+          (iso < todayIso ? " past" : "") +
+          (iso === selected ? " selected" : "") +
+          (mine ? " has-mine" : "");
+        var label = fmtLong.format(new Date(viewY, viewM, d)) + ", " +
+          (list.length === 0 ? "aucune visite" : list.length + (list.length > 1 ? " visites" : " visite"));
+        var names = list.length ? h("div", { class: "names", "aria-hidden": "true" },
+          list.slice(0, 3).map(function (v) {
+            return h("span", null, h("i", { class: "av sm c" + tone(v.name) }), h("span", { class: "txt" }, firstName(v.name)));
+          }),
+          list.length > 3 ? h("span", { class: "more" }, "+" + (list.length - 3)) : null) : null;
+        grid.append(h("button", {
+          type: "button", class: cls, "aria-label": label, "aria-pressed": iso === selected ? "true" : "false",
+          onclick: function () { selected = iso; confirmId = null; renderCal(); renderDay(); }
+        },
+          h("span", { class: "num" }, d),
+          names,
+          list.length ? h("span", { class: "pill" }, list.length) : null));
+      })(d);
+    }
+  }
+
+  function renderDay() {
+    var dt = fromIso(selected);
+    var list = byDate.get(selected) || [];
+    $("dayTitle").textContent = fmtLong.format(dt);
+    $("daySub").textContent = list.length === 0 ? "Aucune visite prévue ce jour"
+      : list.length + (list.length > 1 ? " visites prévues" : " visite prévue");
+
+    var ul = $("dayList");
+    ul.replaceChildren();
+    if (!list.length) {
+      ul.append(h("li", null, h("p", { class: "empty" }, selected < todayIso
+        ? "Personne n’était inscrit ce jour-là."
+        : "Personne n’est encore inscrit. Vous pouvez être le premier.")));
+    }
+    list.forEach(function (v) {
+      var canDel = isMine(v) && db;
+      var del = null;
+      if (canDel) {
+        del = confirmId === v.id
+          ? h("button", { type: "button", class: "link-btn confirm", onclick: function () { removeVisit(v); } }, "Confirmer ?")
+          : h("button", { type: "button", class: "link-btn", "aria-label": "Annuler l’inscription de " + v.name, onclick: function () { confirmId = v.id; renderDay(); } }, "Annuler");
+      }
+      var calBtn = isMine(v) && v.date >= todayIso
+        ? h("button", { type: "button", class: "link-btn cal", "aria-expanded": calFor === v.id ? "true" : "false",
+            onclick: function () { calFor = calFor === v.id ? null : v.id; renderDay(); } }, "Agenda")
+        : null;
+      ul.append(h("li", { class: "visit" + (isMine(v) ? " mine" : "") },
+        h("span", { class: "t" }, hhmm(v.time)),
+        h("span", { class: "who" }, avatar(v.name), h("span", null, v.name), isMine(v) ? h("span", { class: "badge" }, "Vous") : null),
+        h("span", { class: "acts" }, calBtn, del),
+        v.note ? h("span", { class: "note" }, v.note) : null,
+        calFor === v.id && isMine(v) ? calPanel(v) : null));
+    });
+    if (scrollToPanel) {
+      var pnl = ul.querySelector(".calpanel");
+      if (pnl) { scrollToPanel = false; pnl.scrollIntoView({ block: "nearest" }); }
+    }
+
+    var past = selected < todayIso;
+    var noWrite = !db || canWrite === false;
+    $("form").hidden = past || noWrite;
+    var lock = $("lockMsg");
+    if (past) { lock.hidden = false; lock.textContent = "Cette date est passée : les inscriptions sont fermées."; }
+    else if (!db) { lock.hidden = false; lock.textContent = "Le planning partagé n’est pas disponible dans cet affichage."; }
+    else if (canWrite === false) { lock.hidden = false; lock.textContent = "Votre accès permet de consulter le planning, pas de s’inscrire. Demandez à l’organisateur de vous accorder l’accès en modification."; }
+    else lock.hidden = true;
+  }
+
+  function renderUpcoming() {
+    var ul = $("upList");
+    ul.replaceChildren();
+    var up = visits.filter(function (v) { return v.date >= todayIso; }).slice(0, 30);
+    if (!up.length) {
+      ul.append(h("li", null, h("p", { class: "empty" }, "Aucune visite à venir pour le moment.")));
+      return;
+    }
+    up.forEach(function (v) {
+      ul.append(h("li", null, h("button", {
+        type: "button", class: "up" + (isMine(v) ? " mine" : ""),
+        onclick: function () {
+          var d = fromIso(v.date);
+          viewY = d.getFullYear(); viewM = d.getMonth(); selected = v.date; confirmId = null;
+          renderAll();
+          $("day").scrollIntoView({ block: "nearest" });
+        }
+      },
+        h("span", { class: "d" }, fmtShort.format(fromIso(v.date))),
+        h("span", { class: "w" }, avatar(v.name), h("span", null, v.name, " ", h("small", null, hhmm(v.time)), v.note ? h("small", null, " · " + v.note) : null)))));
+    });
+  }
+
+  function renderAll() { renderCal(); renderDay(); renderUpcoming(); }
+
+  function say(text, kind) {
+    var m = $("formMsg");
+    m.textContent = text || "";
+    m.className = "msg" + (kind ? " " + kind : "");
+  }
+
+  async function removeVisit(v) {
+    if (!db) return;
+    try {
+      await db.collection("visites").doc(v.id).delete();
+      confirmId = null;
+      say("Inscription annulée.", "ok");
+    } catch (e) {
+      confirmId = null;
+      renderDay();
+      say("L’annulation a échoué. Réessayez dans un instant.", "err");
+    }
+  }
+
+  $("form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!db || busy) return;
+    var name = $("nameIn").value.trim().replace(/\s+/g, " ");
+    var time = $("timeIn").value;
+    var note = $("noteIn").value.trim();
+    if (name.length < 2) { say("Indiquez votre nom pour vous inscrire.", "err"); $("nameIn").focus(); return; }
+    if (!time) { say("Choisissez une heure de visite.", "err"); $("timeIn").focus(); return; }
+    var dup = (byDate.get(selected) || []).some(function (v) {
+      return v.name.toLowerCase() === name.toLowerCase() && v.time === time;
+    });
+    if (dup) { say("Vous êtes déjà inscrit à cette heure ce jour-là.", "err"); return; }
+    busy = true;
+    $("submitBtn").disabled = true;
+    say("Enregistrement…");
+    try {
+      if (!isMember) {
+        var code = $("codeIn").value.trim();
+        if (!code) { say("Saisissez le code d’accès pour vous inscrire.", "err"); $("codeIn").focus(); busy = false; $("submitBtn").disabled = false; return; }
+        try {
+          await db.collection("membres").doc(uid).set({ code: code });
+        } catch (ce) {
+          say("Ce code n’est pas le bon. Demandez-le à l’organisateur.", "err");
+          $("codeIn").focus();
+          return;
+        }
+        isMember = true;
+        $("codeWrap").hidden = true;
+      }
+      var ref = await db.collection("visites").add({ date: selected, time: time, name: name, note: note, uid: uid, createdAt: Date.now() });
+      lsSet("visite-nom", name);
+      $("noteIn").value = "";
+      mineIds.add(ref.id);
+      calFor = ref.id;
+      scrollToPanel = true;
+      say("C’est enregistré : " + fmtLong.format(fromIso(selected)) + " à " + hhmm(time) + ". Ajoutez-la à votre agenda dans la liste ci-dessus.", "ok");
+      renderDay();
+    } catch (err) {
+      say("L’inscription n’a pas pu être enregistrée. Réessayez dans un instant.", "err");
+    } finally {
+      busy = false;
+      $("submitBtn").disabled = false;
+    }
+  });
+
+  $("prev").addEventListener("click", function () { viewM--; if (viewM < 0) { viewM = 11; viewY--; } renderCal(); });
+  $("next").addEventListener("click", function () { viewM++; if (viewM > 11) { viewM = 0; viewY++; } renderCal(); });
+  $("todayBtn").addEventListener("click", function () {
+    viewY = now.getFullYear(); viewM = now.getMonth(); selected = todayIso; confirmId = null; renderAll();
+  });
+
+  $("nameIn").value = lsGet("visite-nom");
+  renderAll();
+
+  async function start() {
+    try {
+      firebase.initializeApp(firebaseConfig);
+      var cred = await firebase.auth().signInAnonymously();
+      uid = cred.user.uid;
+      db = firebase.firestore();
+    } catch (e) { db = null; }
+    if (!db) { setBanner("Le planning partagé n’est pas disponible pour le moment. Rechargez la page.", true); renderDay(); return; }
+    try {
+      var m = await db.collection("membres").doc(uid).get();
+      isMember = m.exists;
+    } catch (e) { isMember = false; }
+    $("codeWrap").hidden = isMember;
+    renderAll();
+    db.collection("visites").orderBy("date").limit(1000).onSnapshot(function (snap) {
+      rebuild(snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; })
+        .filter(function (o) { return typeof o.date === "string" && typeof o.name === "string"; }));
+      setBanner("");
+      renderAll();
+    }, function () {
+      setBanner("La connexion au planning a été interrompue. Rechargez la page.", true);
+    });
+  }
+  start();
+})();
+</script>
