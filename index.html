@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Visite à Dédette</title>
-<meta name="theme-color" content="#ffd45c">
+<meta name="theme-color" content="#ffdc75">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -13,18 +13,19 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Sans+3:wght@400;500;600&display=swap">
 <style>
 :root {
-  --bg: #eef2f1;
-  --surface: #ffffff;
-  --ink: #17282a;
-  --muted: #566a6c;
-  --line: #d3dddb;
-  --soft: #e1ecea;
+  --bg: #f0f3ec;
+  --surface: #fcfdf9;
+  --ink: #15302f;
+  --muted: #55696a;
+  --line: #dbe3d8;
+  --soft: #e4ebdf;
   --accent: #1d6b66;
   --accent-ink: #ffffff;
   --mine: #a85512;
   --mine-bg: #fbeadb;
   --danger: #a32b2b;
-  --hero: #ffd45c;
+  --hero: #ffdc75;
+  --hero-2: #ffc94a;
   --pop-soft: #fff0bd;
   --cta: #d9432b;
   --cta-ink: #ffffff;
@@ -39,51 +40,55 @@
   --c7: #6b7a0a;
   --c8: #b8650a;
   --c9: #4e5d78;
-  --shadow: 0 1px 2px rgba(23, 40, 42, .06), 0 6px 20px rgba(23, 40, 42, .06);
+  --shadow: 0 1px 2px rgba(21, 48, 47, .06), 0 8px 24px rgba(21, 48, 47, .08);
+  --radius: 20px;
+  --radius-s: 14px;
   --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0f191a;
-    --surface: #172527;
-    --ink: #e6efee;
-    --muted: #93a8a9;
-    --line: #2a3d3f;
-    --soft: #1e3335;
+    --bg: #121b1a;
+    --surface: #1a2726;
+    --ink: #e9f1ed;
+    --muted: #9db1ae;
+    --line: #2b3d3b;
+    --soft: #233533;
     --accent: #5fbdb5;
     --accent-ink: #0c1b1c;
     --mine: #f0a868;
     --mine-bg: #3a2a1b;
     --danger: #f08a8a;
-    --hero: #3b3213;
+    --hero: #4a3c14;
+    --hero-2: #3a2f10;
     --pop-soft: #3a3113;
     --cta: #ff7a63;
     --cta-ink: #2a0f0a;
     --wk: #ff8a75;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .3);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0f191a;
-  --surface: #172527;
-  --ink: #e6efee;
-  --muted: #93a8a9;
-  --line: #2a3d3f;
-  --soft: #1e3335;
+  --bg: #121b1a;
+  --surface: #1a2726;
+  --ink: #e9f1ed;
+  --muted: #9db1ae;
+  --line: #2b3d3b;
+  --soft: #233533;
   --accent: #5fbdb5;
   --accent-ink: #0c1b1c;
   --mine: #f0a868;
   --mine-bg: #3a2a1b;
   --danger: #f08a8a;
-  --hero: #3b3213;
+  --hero: #4a3c14;
+  --hero-2: #3a2f10;
   --pop-soft: #3a3113;
   --cta: #ff7a63;
   --cta-ink: #2a0f0a;
   --wk: #ff8a75;
-  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .3);
 }
 
 * { box-sizing: border-box; }
@@ -104,9 +109,10 @@ button { cursor: pointer; }
 header.hero {
   position: relative;
   overflow: hidden;
-  padding: 22px 88px 24px 20px;
-  border-radius: 16px;
-  background: var(--hero);
+  padding: 24px 88px 26px 22px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--hero), var(--hero-2));
+  box-shadow: var(--shadow);
 }
 header.hero::after {
   content: "";
@@ -138,7 +144,19 @@ header h1 {
   opacity: .75;
 }
 .sub { margin: 8px 0 0; font-size: 1.02rem; max-width: 34ch; }
-.place { margin: 10px 0 0; font-size: .95rem; font-weight: 600; }
+.place { display: flex; align-items: center; gap: 12px; margin: 14px 0 0; font-size: .95rem; font-weight: 600; max-width: 46ch; }
+.door {
+  flex: none;
+  display: grid;
+  justify-items: center;
+  padding: 5px 12px 6px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--hero);
+  box-shadow: inset 0 0 0 2px var(--hero), inset 0 0 0 3px var(--ink);
+}
+.door small { font-size: .62rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; line-height: 1.2; }
+.door b { font-family: var(--font-display); font-size: 1.7rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .hero-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; position: relative; z-index: 1; }
 .maplink {
   display: inline-flex; align-items: center;
@@ -148,7 +166,7 @@ header h1 {
   color: var(--ink);
   font-weight: 600; font-size: .95rem;
   text-decoration: none;
-  box-shadow: var(--shadow);
+  box-shadow: 0 2px 6px rgba(21, 48, 47, .14);
 }
 .maplink:hover { background: var(--soft); }
 .av {
@@ -176,7 +194,7 @@ header h1 {
 .banner {
   margin: 0;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-s);
   background: var(--soft);
   color: var(--ink);
   font-size: .95rem;
@@ -192,8 +210,8 @@ header h1 {
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: var(--radius);
+  padding: 18px;
   box-shadow: var(--shadow);
 }
 h2 {
@@ -211,7 +229,7 @@ h2 {
   width: 44px; height: 44px;
   border: 1px solid var(--line);
   background: var(--surface);
-  border-radius: 10px;
+  border-radius: 14px;
   font-size: 1.4rem;
   line-height: 1;
 }
@@ -221,12 +239,12 @@ h2 {
   padding-inline: 12px;
   border: 1px solid var(--line);
   background: var(--surface);
-  border-radius: 10px;
+  border-radius: 14px;
   font-size: .9rem;
   font-weight: 500;
 }
 .today-btn:hover { background: var(--soft); }
-.dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .dow span {
   text-align: center;
   font-size: .75rem;
@@ -242,7 +260,7 @@ h2 {
   min-height: 72px;
   padding: 6px 4px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--surface);
   text-align: left;
   display: flex;
@@ -295,12 +313,12 @@ ul.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 4px 12px;
   align-items: center;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-s);
   background: var(--surface);
 }
-.visit.mine { background: var(--mine-bg); border-color: transparent; }
+.visit.mine { background: var(--mine-bg); border-color: color-mix(in srgb, var(--mine) 40%, transparent); }
 .visit .t { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 3.2em; }
 .visit .who { font-weight: 600; overflow-wrap: anywhere; display: flex; align-items: center; gap: 8px; min-width: 0; }
 .visit .note { grid-column: 2 / 3; font-size: .9rem; color: var(--muted); overflow-wrap: anywhere; }
@@ -328,7 +346,7 @@ ul.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   display: inline-flex; align-items: center; justify-content: center;
   min-height: 44px; padding: 8px 14px;
   border: 1px solid var(--accent);
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--surface);
   color: var(--accent);
   font-weight: 600; font-size: .95rem;
@@ -336,7 +354,7 @@ ul.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 }
 .cbtn:hover { background: var(--soft); }
 .calnote { margin: 0; font-size: .82rem; color: var(--muted); }
-.empty { margin: 0; padding: 14px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font-size: .95rem; }
+.empty { margin: 0; padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius-s); color: var(--muted); font-size: .95rem; }
 
 form { display: grid; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
 form h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; }
@@ -345,27 +363,31 @@ form h3 { margin: 0; font-family: var(--font-display); font-size: 1.05rem; font-
 label { display: grid; gap: 4px; font-size: .88rem; font-weight: 600; color: var(--muted); }
 label[hidden] { display: none; }
 input[type="text"], input[type="time"] {
+  transition: border-color .15s ease, box-shadow .15s ease;
   width: 100%;
-  min-height: 46px;
-  padding: 8px 12px;
+  min-height: 48px;
+  padding: 8px 14px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-s);
   background: var(--bg);
   color: var(--ink);
   font-weight: 400;
 }
 .submit {
-  min-height: 48px;
+  min-height: 52px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 16px;
   background: var(--cta);
   color: var(--cta-ink);
   font-weight: 600;
-  font-size: 1rem;
-  padding-inline: 18px;
+  font-size: 1.05rem;
+  padding-inline: 20px;
+  box-shadow: 0 4px 12px rgba(217, 67, 43, .3);
 }
-.submit:hover { filter: brightness(1.08); }
+.submit:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.submit:active { transform: translateY(0); }
 .submit:disabled { opacity: .55; cursor: default; }
+input[type="text"]:focus, input[type="time"]:focus { border-color: var(--accent); background: var(--surface); }
 .msg { margin: 0; min-height: 1.3em; font-size: .92rem; color: var(--muted); }
 .msg.err { color: var(--danger); }
 .msg.ok { color: var(--accent); font-weight: 600; }
@@ -377,9 +399,9 @@ input[type="text"], input[type="time"] {
   grid-template-columns: 5.6rem minmax(0, 1fr);
   gap: 2px 10px;
   text-align: left;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-s);
   background: var(--surface);
 }
 .up:hover { background: var(--soft); }
@@ -391,7 +413,9 @@ input[type="text"], input[type="time"] {
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--accent); }
 .legend i.m { background: var(--mine); }
 @media (prefers-reduced-motion: no-preference) {
-  .cell, .up, .nav, .today-btn { transition: background-color .15s ease; }
+  .cell, .up, .nav, .today-btn, .maplink, .cbtn { transition: background-color .15s ease, transform .15s ease, box-shadow .15s ease; }
+  .cell:not(.blank):hover, .up:hover { transform: translateY(-1px); }
+  .submit { transition: filter .15s ease, transform .15s ease; }
 }
 </style>
 
@@ -400,7 +424,7 @@ input[type="text"], input[type="time"] {
     <p class="eyebrow">Planning partagé</p>
     <h1>Visite à Dédette</h1>
     <p class="sub">Qui passe la voir ? Choisissez un jour et inscrivez-vous.</p>
-    <p class="place">Résidence Les Hauts d’Amandie, Faches-Thumesnil</p>
+    <p class="place"><span class="door" role="img" aria-label="Chambre 364"><small>Chambre</small><b>364</b></span><span>Résidence Les Hauts d’Amandie, Faches-Thumesnil</span></p>
     <div class="hero-links">
       <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=R%C3%A9sidence%20Les%20Hauts%20d%27Amandie%20Faches-Thumesnil" target="_blank" rel="noopener">Voir sur la carte</a>
       <a class="maplink" href="https://www.google.com/maps/dir/?api=1&amp;destination=R%C3%A9sidence%20Les%20Hauts%20d%27Amandie%20Faches-Thumesnil" target="_blank" rel="noopener">Itinéraire</a>
@@ -517,6 +541,7 @@ input[type="text"], input[type="time"] {
   var calFor = null;
   var scrollToPanel = false;
   var TITLE = "Visite à Dédette";
+  var PLACE = "Chambre 364, Résidence Les Hauts d’Amandie, Faches-Thumesnil";
 
   function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -534,17 +559,19 @@ input[type="text"], input[type="time"] {
     return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
       "&text=" + encodeURIComponent(TITLE) +
       "&dates=" + compact(shift(v.date, v.time, 0)) + "/" + compact(shift(v.date, v.time, 60)) +
-      "&ctz=Europe%2FParis&details=" + encodeURIComponent(details(v));
+      "&ctz=Europe%2FParis&location=" + encodeURIComponent(PLACE) +
+      "&details=" + encodeURIComponent(details(v));
   }
   function outlookUrl(v) {
     return "https://outlook.live.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent" +
       "&subject=" + encodeURIComponent(TITLE) +
       "&startdt=" + encodeURIComponent(dashed(shift(v.date, v.time, 0))) +
       "&enddt=" + encodeURIComponent(dashed(shift(v.date, v.time, 60))) +
+      "&location=" + encodeURIComponent(PLACE) +
       "&body=" + encodeURIComponent(details(v));
   }
   function plainText(v) {
-    return TITLE + " : " + fmtLong.format(fromIso(v.date)) + " à " + hhmm(v.time) + (v.note ? " (" + v.note + ")" : "");
+    return TITLE + " : " + fmtLong.format(fromIso(v.date)) + " à " + hhmm(v.time) + (v.note ? " (" + v.note + ")" : "") + ". " + PLACE;
   }
   function calPanel(v) {
     var copied = h("p", { class: "calnote", role: "status" }, "Pour Apple Agenda ou un autre agenda : copiez les détails et collez-les dans un nouvel événement.");
