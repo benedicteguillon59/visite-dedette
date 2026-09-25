@@ -71,7 +71,7 @@ button { cursor: pointer; }
 /* En-tête */
 header.hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 20px; align-items: center; padding-right: 6px; }
 .eyebrow { grid-column: 1 / -1; margin: 0; font-size: .92rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--leaf); }
-header h1 { grid-column: 1; margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 10.5vw, 5rem); line-height: .98; color: var(--text); text-wrap: balance; }
+header h1 { grid-column: 1; margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(2.2rem, 8vw, 3.8rem); line-height: 1; color: var(--text); text-wrap: balance; }
 .sub { grid-column: 1; margin: 10px 0 0; max-width: 34ch; font-size: 1.1rem; color: var(--muted); }
 .hero-art { grid-column: 2; grid-row: 2 / 5; width: clamp(96px, 22vw, 190px); height: auto; justify-self: end; }
 .place { grid-column: 1; display: flex; align-items: flex-end; gap: 16px; margin: 14px 0 0; font-weight: 700; }
@@ -84,7 +84,7 @@ header h1 { grid-column: 1; margin: 0; font-family: var(--display); font-weight:
 .maplink:hover { filter: brightness(1.08); }
 @media (max-width: 640px) {
   .hero-art { grid-row: 1 / 3; grid-column: 2; width: 92px; align-self: start; }
-  header h1 { font-size: clamp(2.4rem, 12vw, 3.4rem); }
+  header h1 { font-size: clamp(2rem, 9.5vw, 2.7rem); }
   .eyebrow { grid-column: 1; }
   .sub, .place, .hero-links { grid-column: 1 / -1; }
   .sub { max-width: none; }
@@ -157,7 +157,7 @@ h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 1.5rem
 /* Le jour */
 .day-head { margin-bottom: 14px; }
 .day-head h2 { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "n w" "n m"; column-gap: 16px; align-items: center; }
-.dn { grid-area: n; display: grid; place-items: center; min-width: 96px; height: 96px; padding-inline: 8px; border-radius: 50%; background: var(--wheat); color: #3a2a00; font-family: var(--display); font-size: 3.6rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.dn { grid-area: n; display: grid; place-items: center; min-width: 72px; height: 72px; padding-inline: 6px; border-radius: 50%; background: var(--wheat); color: #3a2a00; font-family: var(--display); font-size: 2.6rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
 .dw { grid-area: w; align-self: end; font-family: var(--body); font-size: .85rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 .dm { grid-area: m; align-self: start; font-size: 1.7rem; text-transform: capitalize; }
 .day-head p { margin: 12px 0 0; color: var(--muted); font-size: .95rem; }
@@ -361,6 +361,15 @@ select { appearance: auto; }
   var calFor = null;
   var scrollToPanel = false;
   var TITLE = "Visite à Dédette";
+  // Adresse du petit script Google qui envoie le mail (voir notification-mail.gs). Vide = pas de mail.
+  var NOTIFY_URL = "";
+  function notifyOrganizer(info) {
+    if (!NOTIFY_URL) return;
+    try {
+      // Envoi discret : si ça échoue, l'inscription reste valable.
+      fetch(NOTIFY_URL, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(info) }).catch(function () {});
+    } catch (e) {}
+  }
   var PLACE = "Chambre 364, Résidence Les Hauts d’Amandie, Faches-Thumesnil";
 
   function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
@@ -738,6 +747,7 @@ select { appearance: auto; }
         docs.slice(i, i + 8).forEach(function (d) { ids.push(d.ref.id); mineIds.add(d.ref.id); });
       }
       lsSet("visite-nom", name);
+      notifyOrganizer({ name: name, time: time, note: note, every: plan.every, dates: dates });
       $("noteIn").value = "";
       $("repeatIn").value = "0";
       calFor = ids[0];
