@@ -258,8 +258,11 @@ select { appearance: auto; }
 
         <form id="form" novalidate>
           <h3>Je m’inscris pour une visite</h3>
-          <label for="nameIn">Votre nom
-            <input type="text" id="nameIn" autocomplete="name" maxlength="60" placeholder="Prénom Nom">
+          <label for="nameSel">Votre nom
+            <select id="nameSel"></select>
+          </label>
+          <label for="nameIn" id="newNameWrap" hidden>Nouveau nom
+            <input type="text" id="nameIn" autocomplete="off" maxlength="60" placeholder="Prénom Nom">
           </label>
           <label for="codeIn" id="codeWrap" hidden>Code d’accès (donné par l’organisateur)
             <input type="text" id="codeIn" autocomplete="off" autocapitalize="off" maxlength="40" placeholder="Le code de la famille">
@@ -358,6 +361,7 @@ select { appearance: auto; }
   var confirmId = null;
   var busy = false;
   var mineIds = new Set();
+  var currentKey = "";
   var calFor = null;
   var scrollToPanel = false;
   var TITLE = "Visite à Dédette";
@@ -375,7 +379,8 @@ select { appearance: auto; }
   function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-  function isMine(v) { return (!!uid && v.uid === uid) || mineIds.has(v.id); }
+  // « Mes » inscriptions : faites depuis cet appareil, ou au nom de la personne choisie dans la liste.
+  function isMine(v) { return (!!uid && v.uid === uid) || mineIds.has(v.id) || (!!currentKey && personKey(v.name) === currentKey); }
 
   function shift(iso, t, addMin) {
     var p = iso.split("-"), q = (t || "14:00").split(":");
@@ -672,9 +677,12 @@ select { appearance: auto; }
   async function removeSeries(v) {
     if (!db) return;
     try {
-      var batch = db.batch();
-      rest(v).forEach(function (x) { batch.delete(db.collection("visites").doc(x.id)); });
-      await batch.commit();
+      var list = rest(v);
+      for (var i = 0; i < list.length; i += 8) {
+        var batch = db.batch();
+        list.slice(i, i + 8).forEach(function (x) { batch.delete(db.collection("visites").doc(x.id)); });
+        await batch.commit();
+      }
       confirmId = null;
       say("Les visites ont été annulées.", "ok");
     } catch (e) {
@@ -700,13 +708,75 @@ select { appearance: auto; }
   }
   ["repeatIn", "repeatFor", "timeIn"].forEach(function (id) { $(id).addEventListener("input", updateRepeatHint); });
 
+  // ---- Liste des personnes : noms déjà inscrits + noms ajoutés à la main ----
+  var personsDb = [];
+  var people = [];
+  var chosenName = lsGet("visite-nom");
+  var namePick = chosenName ? personKey(chosenName) : "";
+  function personKey(n) {
+    return String(n || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ");
+  }
+  function personDocId(n) {
+    return personKey(n).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || ("p" + Date.now().toString(36));
+  }
+  function rebuildPeople() {
+    var map = new Map();
+    var add = function (name, when) {
+      var k = personKey(name);
+      if (k.length < 2) return;
+      var cur = map.get(k);
+      if (!cur || when < cur.when) map.set(k, { key: k, name: String(name).trim(), when: when });
+    };
+    personsDb.forEach(function (x) { add(x.name, x.createdAt || 0); });
+    visits.forEach(function (v) { add(v.name, v.createdAt || 0); });
+    if (chosenName) add(chosenName, Infinity);
+    people = Array.from(map.values()).sort(function (a, b) { return a.name.localeCompare(b.name, "fr"); });
+    renderNameSelect();
+  }
+  function renderNameSelect() {
+    var sel = $("nameSel");
+    if (namePick !== "" && namePick !== "__new__" && !people.some(function (x) { return x.key === namePick; })) namePick = "";
+    if (!people.length && namePick === "") namePick = "__new__";
+    sel.replaceChildren();
+    sel.append(h("option", { value: "" }, people.length ? "Choisissez votre nom" : "Aucun nom pour l’instant"));
+    people.forEach(function (x) { sel.append(h("option", { value: x.key }, x.name)); });
+    sel.append(h("option", { value: "__new__" }, "Ajouter un nouveau nom…"));
+    sel.value = namePick;
+    $("newNameWrap").hidden = namePick !== "__new__";
+    var key = namePick && namePick !== "__new__" ? namePick : "";
+    if (key !== currentKey) { currentKey = key; renderAll(); }
+  }
+  function selectedName() {
+    if (namePick === "__new__") return $("nameIn").value.trim().replace(/\s+/g, " ");
+    var found = people.find(function (x) { return x.key === namePick; });
+    return found ? found.name : "";
+  }
+  function addPerson(name) {
+    var k = personKey(name);
+    if (personsDb.some(function (x) { return personKey(x.name) === k; })) return;
+    try { db.collection("personnes").doc(personDocId(name)).set({ name: name, createdAt: Date.now() }).catch(function () {}); } catch (e) {}
+  }
+  $("nameSel").addEventListener("change", function () {
+    namePick = this.value;
+    var found = people.find(function (x) { return x.key === namePick; });
+    if (found) { chosenName = found.name; lsSet("visite-nom", found.name); }
+    renderNameSelect();
+    if (namePick === "__new__") $("nameIn").focus();
+  });
+
   $("form").addEventListener("submit", async function (e) {
     e.preventDefault();
     if (!db || busy) return;
-    var name = $("nameIn").value.trim().replace(/\s+/g, " ");
+    var name = selectedName();
     var time = $("timeIn").value;
     var note = $("noteIn").value.trim();
+    if (!namePick) { say("Choisissez votre nom dans la liste, ou ajoutez-le.", "err"); $("nameSel").focus(); return; }
     if (name.length < 2) { say("Indiquez votre nom pour vous inscrire.", "err"); $("nameIn").focus(); return; }
+    if (namePick === "__new__") {
+      // même nom déjà dans la liste (majuscules ou accents différents) : on reprend l'orthographe existante
+      var known = people.find(function (x) { return x.key === personKey(name); });
+      if (known) name = known.name;
+    }
     if (!time) { say("Choisissez une heure de visite.", "err"); $("timeIn").focus(); return; }
     var plan = repeatPlan();
     var isTaken = function (iso) {
@@ -746,7 +816,12 @@ select { appearance: auto; }
         await batch.commit();
         docs.slice(i, i + 8).forEach(function (d) { ids.push(d.ref.id); mineIds.add(d.ref.id); });
       }
+      chosenName = name;
+      namePick = personKey(name);
       lsSet("visite-nom", name);
+      addPerson(name);
+      $("nameIn").value = "";
+      rebuildPeople();
       notifyOrganizer({ name: name, time: time, note: note, every: plan.every, dates: dates });
       $("noteIn").value = "";
       $("repeatIn").value = "0";
@@ -773,7 +848,7 @@ select { appearance: auto; }
     viewY = now.getFullYear(); viewM = now.getMonth(); selected = todayIso; confirmId = null; renderAll();
   });
 
-  $("nameIn").value = lsGet("visite-nom");
+  rebuildPeople();
   renderAll();
 
   // Réparation des dates impossibles (ex. « 2026-09-31 ») créées par une ancienne version : on les
@@ -822,12 +897,18 @@ select { appearance: auto; }
         .filter(function (o) { return typeof o.date === "string" && typeof o.name === "string"; })
         .map(fixDate);
       rebuild(list);
+      rebuildPeople();
       setBanner("");
       renderAll();
       repairDates(list);
     }, function () {
       setBanner("La connexion au planning a été interrompue. Rechargez la page.", true);
     });
+    // Liste des personnes ajoutées à la main (si l'accès n'est pas encore autorisé, on utilise les noms des visites)
+    db.collection("personnes").onSnapshot(function (snap) {
+      personsDb = snap.docs.map(function (d) { return d.data() || {}; }).filter(function (o) { return typeof o.name === "string"; });
+      rebuildPeople();
+    }, function () {});
   }
   start();
 })();
