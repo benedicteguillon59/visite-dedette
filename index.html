@@ -164,7 +164,9 @@ h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 1.5rem
 ul.list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .visit { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 2px 14px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--soft); }
 .visit.mine { background: var(--wheat-soft); color: var(--wheat-ink); }
-.visit .t { min-width: 3.4em; font-family: var(--display); font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.visit .t { display: grid; min-width: 3.4em; font-family: var(--display); font-size: 1.25rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.visit .t small { font-family: var(--body); font-size: .78rem; font-weight: 600; color: var(--muted); }
+.visit.mine .t small { color: var(--wheat-ink); opacity: .8; }
 .visit .who { display: flex; align-items: center; gap: 10px; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
 .visit .note { grid-column: 2 / 3; color: var(--muted); font-size: 1rem; overflow-wrap: anywhere; }
 .visit.mine .note { color: var(--wheat-ink); }
@@ -267,12 +269,21 @@ select { appearance: auto; }
           <label for="codeIn" id="codeWrap" hidden>Code d’accès (donné par l’organisateur)
             <input type="text" id="codeIn" autocomplete="off" autocapitalize="off" maxlength="40" placeholder="Le code de la famille">
           </label>
+          <label for="noteIn">Précision (facultatif)
+            <input type="text" id="noteIn" maxlength="80" placeholder="Un mot, si besoin">
+          </label>
           <div class="row">
-            <label for="noteIn">Précision (facultatif)
-              <input type="text" id="noteIn" maxlength="80" placeholder="Un mot, si besoin">
-            </label>
             <label for="timeIn">Heure
               <input type="time" id="timeIn" value="14:00">
+            </label>
+            <label for="durationIn">Durée
+              <select id="durationIn">
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60" selected>1 h</option>
+                <option value="90">1 h 30</option>
+                <option value="120">2 h</option>
+              </select>
             </label>
           </div>
           <div class="row" id="repeatRow">
@@ -405,10 +416,17 @@ select { appearance: auto; }
     return visits.filter(function (x) { return x.serie === v.serie && x.uid === v.uid && x.date >= v.date; });
   }
   function details(v) { return "Inscrit(e) : " + v.name + (v.note ? "\n" + v.note : ""); }
+  function durMin(v) { return v.duration > 0 ? v.duration : 60; }
+  function durLabel(min) {
+    if (min === 60) return "1 h";
+    if (min % 60 === 0) return (min / 60) + " h";
+    if (min < 60) return min + " min";
+    return Math.floor(min / 60) + " h " + (min % 60);
+  }
   function googleUrl(v) {
     return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
       "&text=" + encodeURIComponent(TITLE) +
-      "&dates=" + compact(shift(v.date, v.time, 0)) + "/" + compact(shift(v.date, v.time, 60)) +
+      "&dates=" + compact(shift(v.date, v.time, 0)) + "/" + compact(shift(v.date, v.time, durMin(v))) +
       "&ctz=Europe%2FParis&location=" + encodeURIComponent(PLACE) +
       (v.serie ? "&recur=" + encodeURIComponent("RRULE:FREQ=WEEKLY;INTERVAL=" + (v.every === 14 ? 2 : 1) + ";COUNT=" + rest(v).length) : "") +
       "&details=" + encodeURIComponent(details(v));
@@ -417,7 +435,7 @@ select { appearance: auto; }
     return "https://outlook.live.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent" +
       "&subject=" + encodeURIComponent(TITLE) +
       "&startdt=" + encodeURIComponent(dashed(shift(v.date, v.time, 0))) +
-      "&enddt=" + encodeURIComponent(dashed(shift(v.date, v.time, 60))) +
+      "&enddt=" + encodeURIComponent(dashed(shift(v.date, v.time, durMin(v)))) +
       "&location=" + encodeURIComponent(PLACE) +
       "&body=" + encodeURIComponent(details(v));
   }
@@ -442,7 +460,7 @@ select { appearance: auto; }
     list.forEach(function (x) {
       out.push("BEGIN:VEVENT", "UID:" + x.id + "@visite-dedette", "DTSTAMP:" + stamp,
         "DTSTART;TZID=Europe/Paris:" + compact(shift(x.date, x.time, 0)),
-        "DTEND;TZID=Europe/Paris:" + compact(shift(x.date, x.time, 60)),
+        "DTEND;TZID=Europe/Paris:" + compact(shift(x.date, x.time, durMin(x))),
         "SUMMARY:" + icsText(TITLE), "LOCATION:" + icsText(PLACE), "DESCRIPTION:" + icsText(details(x)), "END:VEVENT");
     });
     out.push("END:VCALENDAR");
@@ -591,7 +609,7 @@ select { appearance: auto; }
             onclick: function () { calFor = calFor === v.id ? null : v.id; renderDay(); } }, "Agenda")
         : null;
       ul.append(h("li", { class: "visit" + (isMine(v) ? " mine" : "") },
-        h("span", { class: "t" }, hhmm(v.time)),
+        h("span", { class: "t" }, hhmm(v.time), durMin(v) !== 60 ? h("small", null, " " + durLabel(durMin(v))) : null),
         h("span", { class: "who" }, avatar(v.name), h("span", null, v.name), isMine(v) ? h("span", { class: "badge" }, "Vous") : null),
         h("span", { class: "acts" }, calBtn, del),
         v.note ? h("span", { class: "note" }, v.note) : null,
@@ -769,6 +787,7 @@ select { appearance: auto; }
     if (!db || busy) return;
     var name = selectedName();
     var time = $("timeIn").value;
+    var duration = +$("durationIn").value || 60;
     var note = $("noteIn").value.trim();
     if (!namePick) { say("Choisissez votre nom dans la liste, ou ajoutez-le.", "err"); $("nameSel").focus(); return; }
     if (name.length < 2) { say("Indiquez votre nom pour vous inscrire.", "err"); $("nameIn").focus(); return; }
@@ -805,7 +824,7 @@ select { appearance: auto; }
       var serie = plan.every ? Date.now().toString(36) + Math.random().toString(36).slice(2, 8) : null;
       var ids = [];
       var docs = dates.map(function (iso) {
-        var data = { date: iso, time: time, name: name, note: note, uid: uid, createdAt: Date.now() };
+        var data = { date: iso, time: time, duration: duration, name: name, note: note, uid: uid, createdAt: Date.now() };
         if (serie) { data.serie = serie; data.every = plan.every; }
         return { ref: db.collection("visites").doc(), data: data };
       });
@@ -822,9 +841,10 @@ select { appearance: auto; }
       addPerson(name);
       $("nameIn").value = "";
       rebuildPeople();
-      notifyOrganizer({ name: name, time: time, note: note, every: plan.every, dates: dates });
+      notifyOrganizer({ name: name, time: time, duration: duration, note: note, every: plan.every, dates: dates });
       $("noteIn").value = "";
       $("repeatIn").value = "0";
+      $("durationIn").value = "60";
       calFor = ids[0];
       scrollToPanel = true;
       say(dates.length > 1
@@ -869,7 +889,7 @@ select { appearance: auto; }
       var batch = db.batch();
       bad.forEach(function (o) {
         batch.delete(db.collection("visites").doc(o.id));
-        var data = { date: o.date, time: o.time, name: o.name, note: o.note || "", uid: o.uid, createdAt: o.createdAt || Date.now() };
+        var data = { date: o.date, time: o.time, duration: durMin(o), name: o.name, note: o.note || "", uid: o.uid, createdAt: o.createdAt || Date.now() };
         if (o.serie) { data.serie = o.serie; data.every = o.every; }
         batch.set(db.collection("visites").doc(), data);
       });
