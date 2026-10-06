@@ -1,15 +1,21 @@
 {
+  "id": "./",
   "name": "Visite à Dédette",
   "short_name": "Dédette",
   "description": "Le calendrier partagé des visites à Dédette.",
   "lang": "fr",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#ffd45c",
-  "theme_color": "#ffd45c",
+  "orientation": "portrait",
+  "background_color": "#dfe9cf",
+  "theme_color": "#dfe9cf",
+  "categories": ["lifestyle", "social"],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

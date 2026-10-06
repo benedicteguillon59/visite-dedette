@@ -7,6 +7,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Dédette">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -220,6 +222,36 @@ select { appearance: auto; }
 @media (prefers-reduced-motion: no-preference) {
   .cell, .up, .nav, .today-btn, .maplink, .cbtn, .submit { transition: background-color .15s ease, filter .15s ease, transform .1s ease, box-shadow .1s ease; }
 }
+
+/* Encart d'installation */
+.install { padding: 14px 16px; border-radius: 16px; background: var(--paper); border: 2px dashed var(--wheat); display: grid; gap: 12px; }
+.install-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.install-text { display: grid; gap: 2px; margin: 0; flex: 1 1 260px; }
+.install-text span { color: var(--muted); font-size: 1rem; }
+.install-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.install-btn { min-height: 46px; padding: 8px 20px; border: 0; border-radius: 999px; background: var(--leaf); color: var(--leaf-ink); font-weight: 700; box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
+.install-later { min-height: 46px; padding: 8px 14px; border: 0; background: none; color: var(--muted); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.install-steps { margin: 0; padding-left: 1.4rem; display: grid; gap: 6px; }
+.install-steps li::marker { font-weight: 700; color: var(--leaf); }
+
+/* Pour venir voir Dédette */
+.info { --band: var(--leaf); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 14px 0 0; }
+.facts > div { padding: 12px 14px; border-radius: 14px; background: var(--soft); }
+.facts dt { margin-bottom: 4px; font-size: .85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.tel { display: inline-flex; align-items: center; min-height: 46px; padding: 8px 20px; border-radius: 999px; background: var(--leaf); color: var(--leaf-ink); font-size: 1.1rem; font-weight: 700; text-decoration: none; box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
+.secret { margin-top: 18px; padding-top: 16px; border-top: 2px dotted var(--line); display: grid; gap: 12px; }
+.secret h3 { margin: 0; font-family: var(--display); font-size: 1.3rem; font-weight: 600; }
+.unlock { margin: 0; padding: 0; border: 0; gap: 12px; }
+#secretBody { display: grid; gap: 12px; }
+.codes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.code-box { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; background: var(--wheat-soft); color: var(--wheat-ink); }
+.code-box span { font-size: .95rem; font-weight: 700; }
+.code-box strong { font-family: var(--display); font-size: 2.1rem; font-weight: 700; letter-spacing: .12em; line-height: 1.1; overflow-wrap: anywhere; }
+.key-box { padding: 12px 14px; border-radius: 14px; background: var(--soft); display: grid; gap: 4px; }
+.key-box span { font-size: .85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.key-box p { margin: 0; font-size: 1.1rem; }
 </style>
 
 <main class="app">
@@ -228,14 +260,26 @@ select { appearance: auto; }
     <p class="eyebrow">Planning partagé</p>
     <h1>Visite à Dédette</h1>
     <p class="sub">Qui passe la voir ? Choisissez un jour et inscrivez-vous.</p>
-    <p class="place"><span class="door" role="img" aria-label="Chambre 364"><small>Chambre</small><b>364</b></span><span>Résidence Les Hauts d’Amandie, Faches-Thumesnil</span></p>
+    <p class="place"><span class="door" role="img" aria-label="Chambre 126"><small>Chambre</small><b>126</b></span><span>Résidence de la Pévèle<br>227 Rue Lucie et Raymond Aubrac<br>59830 Cysoing</span></p>
     <div class="hero-links">
-      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=R%C3%A9sidence%20Les%20Hauts%20d%27Amandie%20Faches-Thumesnil" target="_blank" rel="noopener">Voir sur la carte</a>
-      <a class="maplink" href="https://www.google.com/maps/dir/?api=1&amp;destination=R%C3%A9sidence%20Les%20Hauts%20d%27Amandie%20Faches-Thumesnil" target="_blank" rel="noopener">Itinéraire</a>
+      <a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=R%C3%A9sidence%20de%20la%20P%C3%A9v%C3%A8le%2C%20227%20Rue%20Lucie%20et%20Raymond%20Aubrac%2C%2059830%20Cysoing" target="_blank" rel="noopener">Voir sur la carte</a>
+      <a class="maplink" href="https://www.google.com/maps/dir/?api=1&amp;destination=R%C3%A9sidence%20de%20la%20P%C3%A9v%C3%A8le%2C%20227%20Rue%20Lucie%20et%20Raymond%20Aubrac%2C%2059830%20Cysoing" target="_blank" rel="noopener">Itinéraire</a>
+      <a class="maplink" href="#info">Infos pour venir</a>
     </div>
   </header>
 
   <p class="banner" id="banner" role="status">Chargement du planning…</p>
+
+  <section class="install" id="install" aria-label="Installer l’application" hidden>
+    <div class="install-row">
+      <p class="install-text"><strong>Gardez l’appli sous la main</strong><span>Ajoutez-la à l’écran d’accueil de votre téléphone, comme une vraie application.</span></p>
+      <div class="install-actions">
+        <button type="button" class="install-btn" id="installBtn">Comment faire ?</button>
+        <button type="button" class="install-later" id="installLater">Plus tard</button>
+      </div>
+    </div>
+    <ol class="install-steps" id="installSteps" hidden></ol>
+  </section>
 
   <div class="layout">
     <section class="card" aria-label="Calendrier des visites">
@@ -316,6 +360,27 @@ select { appearance: auto; }
       </section>
     </div>
   </div>
+
+  <section class="card info" id="info" aria-labelledby="infoTitle">
+    <h2 id="infoTitle">Pour venir voir Dédette</h2>
+    <dl class="facts">
+      <div><dt>Résidence</dt><dd>Résidence de la Pévèle<br>227 Rue Lucie et Raymond Aubrac<br>59830 Cysoing</dd></div>
+      <div><dt>Chambre</dt><dd>126</dd></div>
+      <div><dt>Téléphone de la résidence</dt><dd><a class="tel" href="tel:+33320593324">03 20 59 33 24</a></dd></div>
+    </dl>
+    <div class="secret">
+      <h3>Codes de la porte et clef de la chambre</h3>
+      <form class="unlock" id="unlock" novalidate>
+        <p class="calnote" id="unlockHint">Ces informations sont réservées aux personnes qui ont le code d’accès, le même que pour s’inscrire.</p>
+        <label for="infoCode">Code d’accès
+          <input type="text" id="infoCode" autocomplete="off" autocapitalize="off" maxlength="40" placeholder="Le code de la famille">
+        </label>
+        <button class="submit" id="unlockBtn" type="submit">Voir les codes et la clef</button>
+        <p class="msg" id="unlockMsg" role="status"></p>
+      </form>
+      <div id="secretBody" hidden></div>
+    </div>
+  </section>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -385,7 +450,7 @@ select { appearance: auto; }
       fetch(NOTIFY_URL, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(info) }).catch(function () {});
     } catch (e) {}
   }
-  var PLACE = "Chambre 364, Résidence Les Hauts d’Amandie, Faches-Thumesnil";
+  var PLACE = "Chambre 126, Résidence de la Pévèle, 227 Rue Lucie et Raymond Aubrac, 59830 Cysoing";
 
   function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -820,6 +885,7 @@ select { appearance: auto; }
         }
         isMember = true;
         $("codeWrap").hidden = true;
+        refreshInfo();
       }
       var serie = plan.every ? Date.now().toString(36) + Math.random().toString(36).slice(2, 8) : null;
       var ids = [];
@@ -898,6 +964,100 @@ select { appearance: auto; }
     repairing = false;
   }
 
+  // ---- Codes de la porte et clef : réservés aux membres, lus dans la base (jamais écrits dans la page) ----
+  async function refreshInfo() {
+    $("unlock").hidden = isMember;
+    var box = $("secretBody");
+    box.hidden = !isMember;
+    if (!isMember || !db) return;
+    box.replaceChildren(h("p", { class: "calnote" }, "Chargement…"));
+    try {
+      var snap = await db.collection("infos").doc("acces").get();
+      var d = snap.exists ? (snap.data() || {}) : null;
+      if (!d || (!d.entree && !d.sortie && !d.cle)) {
+        box.replaceChildren(h("p", { class: "calnote" }, "Ces informations ne sont pas encore disponibles. Demandez-les à l’organisatrice."));
+        return;
+      }
+      var parts = [];
+      var codes = [];
+      if (d.entree) codes.push(h("div", { class: "code-box" }, h("span", null, "Code de la porte d’entrée"), h("strong", null, String(d.entree))));
+      if (d.sortie) codes.push(h("div", { class: "code-box" }, h("span", null, "Code de la porte de sortie"), h("strong", null, String(d.sortie))));
+      if (codes.length) parts.push(h("div", { class: "codes" }, codes));
+      if (d.cle) parts.push(h("div", { class: "key-box" }, h("span", null, "Clef de la chambre"), h("p", null, String(d.cle))));
+      box.replaceChildren.apply(box, parts);
+    } catch (e) {
+      box.replaceChildren(h("p", { class: "calnote" }, "Ces informations ne sont pas disponibles pour le moment. Réessayez dans un instant."));
+    }
+  }
+  $("unlock").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var msg = $("unlockMsg");
+    var code = $("infoCode").value.trim();
+    if (!db) { msg.textContent = "Le planning n’est pas disponible pour le moment. Rechargez la page."; msg.className = "msg err"; return; }
+    if (!code) { msg.textContent = "Saisissez le code d’accès."; msg.className = "msg err"; $("infoCode").focus(); return; }
+    $("unlockBtn").disabled = true;
+    msg.textContent = "Vérification…"; msg.className = "msg";
+    try {
+      await db.collection("membres").doc(uid).set({ code: code });
+      isMember = true;
+      $("codeWrap").hidden = true;
+      $("infoCode").value = "";
+      msg.textContent = "";
+      refreshInfo();
+    } catch (err) {
+      msg.textContent = "Ce code n’est pas le bon. Demandez-le à l’organisatrice.";
+      msg.className = "msg err";
+      $("infoCode").focus();
+    } finally {
+      $("unlockBtn").disabled = false;
+    }
+  });
+
+  // ---- Installer l'appli sur l'écran d'accueil (Android et iPhone) ----
+  var deferredInstall = null;
+  var ua = navigator.userAgent || "";
+  var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/.test(ua);
+  function isStandalone() {
+    return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  }
+  function installPostponed() { return Date.now() - (+lsGet("visite-install-plus-tard") || 0) < 14 * 86400000; }
+  function showInstall() {
+    var box = $("install");
+    var possible = !!deferredInstall || isIOS || isAndroid;
+    box.hidden = !possible || isStandalone() || installPostponed();
+    $("installBtn").textContent = deferredInstall ? "Installer" : "Comment faire ?";
+  }
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferredInstall = e; showInstall(); });
+  window.addEventListener("appinstalled", function () { deferredInstall = null; $("install").hidden = true; });
+  $("installBtn").addEventListener("click", async function () {
+    if (deferredInstall) {
+      deferredInstall.prompt();
+      try { await deferredInstall.userChoice; } catch (e) {}
+      deferredInstall = null;
+      showInstall();
+      return;
+    }
+    var steps = $("installSteps");
+    if (!steps.hidden) { steps.hidden = true; return; }
+    var list = isIOS
+      ? ["Ouvrez cette page dans Safari (le navigateur bleu avec une boussole).",
+         "Touchez le bouton Partager : le carré avec une flèche vers le haut, en bas de l’écran.",
+         "Faites défiler le menu, puis touchez « Sur l’écran d’accueil ».",
+         "Touchez « Ajouter », en haut à droite. L’icône apparaît avec vos autres applications."]
+      : ["Ouvrez cette page dans Chrome.",
+         "Touchez les trois points ⋮, en haut à droite.",
+         "Touchez « Installer l’application » (ou « Ajouter à l’écran d’accueil »).",
+         "Touchez « Installer ». L’icône apparaît avec vos autres applications."];
+    steps.replaceChildren.apply(steps, list.map(function (t) { return h("li", null, t); }));
+    steps.hidden = false;
+  });
+  $("installLater").addEventListener("click", function () { lsSet("visite-install-plus-tard", String(Date.now())); $("install").hidden = true; });
+  showInstall();
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+
   async function start() {
     try {
       firebase.initializeApp(firebaseConfig);
@@ -911,6 +1071,7 @@ select { appearance: auto; }
       isMember = m.exists;
     } catch (e) { isMember = false; }
     $("codeWrap").hidden = isMember;
+    refreshInfo();
     renderAll();
     db.collection("visites").orderBy("date").limit(1000).onSnapshot(function (snap) {
       var list = snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; })

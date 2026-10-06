@@ -5,7 +5,7 @@ Application web mobile (Android et iPhone) : un calendrier partagé où chacun v
 ## Fichiers
 
 - `index.html` : toute l'application (HTML, CSS et JavaScript dans un seul fichier, sans bibliothèque à part les scripts Firebase chargés depuis gstatic.com).
-- `manifest.webmanifest` et `icons/` : installation sur l'écran d'accueil (icônes 192, 512, apple-touch 180, favicon 32). Icônes générées avec Pillow (maison vert sarcelle, cœur corail, fond jaune `#ffd45c`).
+- `manifest.webmanifest`, `sw.js` et `icons/` : installation sur l'écran d'accueil (icônes 192, 512, apple-touch 180, favicon 32). Icônes générées avec Pillow (maison vert sarcelle, cœur corail, fond jaune `#ffd45c`). `sw.js` est un service worker minimal « réseau d'abord » (`cache: no-cache`) : il rend l'appli installable sans jamais la coincer sur une vieille version, et n'intercepte pas Firebase ni Google.
 - `firestore.rules` : copie des règles de sécurité Firestore. Le code d'accès y est remplacé par `CHANGER-MOI` ; le vrai code n'existe que dans la console Firebase.
 - `.claude/launch.json` : lance un serveur local (`python -m http.server 8765`) pour tester.
 
@@ -14,6 +14,16 @@ Application web mobile (Android et iPhone) : un calendrier partagé où chacun v
 Dédette est une mamie, ancienne agricultrice : le graphisme vient de son monde. Fond vert prairie à sillons, cartes en sachets de graines (bord festonné coquelicot / blé / bleuet), tournesol dessiné dans l'en-tête, plaque « Chambre 364 » sur un piquet de jardin, jour choisi dans un rond jaune blé. Polices : Fredoka (titres) et Atkinson Hyperlegible (texte), via Google Fonts. Mode sombre : terre de nuit. Les couleurs sont des variables en haut du `<style>`.
 
 Règles à garder (l'appli est utilisée par des personnes âgées) : texte courant d'au moins 16 px (18 px de base), contraste d'au moins 4,5, zones à toucher d'au moins 44 px, et toucher un jour amène au formulaire sur téléphone. Avant de changer le look, vérifier ces points.
+
+## Lieu (depuis le 06/10/2026)
+
+Résidence de la Pévèle, 227 Rue Lucie et Raymond Aubrac, 59830 Cysoing. Chambre 126. Téléphone de la résidence : 03 20 59 33 24. (Avant : Résidence Les Hauts d'Amandie, Faches-Thumesnil, chambre 364.) L'adresse est dans l'en-tête, dans les liens Google Maps, dans la carte « Pour venir voir Dédette » et dans la variable `PLACE` (lieu des événements d'agenda).
+
+**Codes de la porte et clef de la chambre : jamais dans `index.html`.** Le dépôt GitHub et le site sont publics ; ces informations sont donc dans Firestore, document `infos/acces` (champs texte `entree`, `sortie`, `cle`), saisi à la main dans la console Firebase. Les règles ne le laissent lire qu'aux membres (appareils qui ont saisi le code d'accès) et interdisent toute écriture depuis le site. La carte affiche les codes aux membres ; les autres voient un champ « code d'accès » (`refreshInfo`, formulaire `#unlock`). Ne jamais recopier ces codes dans CLAUDE.md, le code, ni GitHub.
+
+## Installation sur l'écran d'accueil
+
+Android (Chrome) : le navigateur propose l'installation (`beforeinstallprompt`), l'encart « Gardez l'appli sous la main » affiche alors un bouton « Installer » ; sinon il explique les étapes. iPhone (Safari) : pas d'installation automatique, l'encart explique Partager > Sur l'écran d'accueil. L'encart disparaît une fois l'appli installée, ou 14 jours après « Plus tard » (`visite-install-plus-tard` dans `localStorage`). Non testé sur un vrai iPhone.
 
 ## Fonctions
 
@@ -54,7 +64,7 @@ Règles à garder (l'appli est utilisée par des personnes âgées) : texte cour
 
 1. Modifier `index.html` (et tester en local avec `preview_start` sur `visite-dedette`, puis recharger avec le cache vidé).
 2. Sur GitHub : dépôt `visite-dedette` > Add file > Upload files > glisser le fichier modifié > Commit changes. Le site se met à jour en une à deux minutes.
-3. Envoyer seulement `index.html`, `manifest.webmanifest` et `icons/`. Ne jamais envoyer `CLAUDE.md`, `firestore.rules`, `.claude/` ni le code d'accès.
+3. Envoyer seulement `index.html`, `manifest.webmanifest`, `sw.js` et `icons/`. Ne jamais envoyer `CLAUDE.md`, `firestore.rules`, `.claude/` ni le code d'accès.
 
 ## Changer le code d'accès ou les règles
 
